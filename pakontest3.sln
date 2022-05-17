@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pakontest3", "pakontest3\pakontest3.csproj", "{D6BD3C59-8D48-4B73-AEF8-2671AF3D10CD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D6BD3C59-8D48-4B73-AEF8-2671AF3D10CD}.Debug|x86.ActiveCfg = Debug|x86
+		{D6BD3C59-8D48-4B73-AEF8-2671AF3D10CD}.Debug|x86.Build.0 = Debug|x86
+		{D6BD3C59-8D48-4B73-AEF8-2671AF3D10CD}.Release|x86.ActiveCfg = Release|x86
+		{D6BD3C59-8D48-4B73-AEF8-2671AF3D10CD}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
