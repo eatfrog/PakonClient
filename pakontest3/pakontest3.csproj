@@ -78,8 +78,32 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddPictureToSaveGroup.cs" />
+    <Compile Include="CallBackClient.cs" />
+    <Compile Include="Global.cs" />
+    <Compile Include="ImageFromClientBuffer.cs" />
+    <Compile Include="IntBits.cs" />
+    <Compile Include="ISavePictures.cs" />
+    <Compile Include="ISavePictures3.cs" />
+    <Compile Include="IScanPictures.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scanner.cs" />
+    <Compile Include="ScannerCapabilities.cs" />
+    <Compile Include="ScannerHW135.cs" />
+    <Compile Include="ScannerHW235.cs" />
+    <Compile Include="ScannerHW335.cs" />
+    <Compile Include="ScannerInitializeWarnings.cs" />
+    <Compile Include="ScannerSave.cs" />
+    <Compile Include="ScannerScan.cs" />
+    <Compile Include="ScannerSettings.cs" />
+    <Compile Include="ScannerSettingsSave.cs" />
+    <Compile Include="ScannerUnsafe.cs" />
+    <Compile Include="SiPlanarFileHeader.cs" />
+    <Compile Include="TLXError.cs" />
+    <Compile Include="TLXHardware.cs" />
+    <Compile Include="TLXSaveProgress.cs" />
+    <Compile Include="TLXScanProgress.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="TLXLib">
