@@ -18,6 +18,6 @@ public class CallBackClient : ICallBackClient
         {
             Thread.Sleep(300);
         }
-        m_csScanner.TLXAwake(lOperation, lStatus);
+        m_csScanner.TLXAwake((WORKER_THREAD_OPERATION_000 )lOperation, lStatus);
     }
 }

@@ -62,94 +62,92 @@ public class Scanner
         m_csScannerSave = new ScannerSave(m_csTLX, m_csUnsafe);
     }
 
-    public void TLXAwake(int lOperation, int lStatus)
+    public void TLXAwake(WORKER_THREAD_OPERATION_000 lOperation, int lStatus)
     {
         WORKER_THREAD_OPERATION_000 wORKER_THREAD_OPERATION_ = WORKER_THREAD_OPERATION_000.WTO_InitializeProgress;
-        if (Enum.IsDefined(wORKER_THREAD_OPERATION_.GetType(), lOperation))
+
+        switch (lOperation)
         {
-            wORKER_THREAD_OPERATION_ = (WORKER_THREAD_OPERATION_000)lOperation;
-            switch (wORKER_THREAD_OPERATION_)
-            {
-                case WORKER_THREAD_OPERATION_000.WTO_InitializeError:
-                case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateApsError:
-                case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateCcdError:
-                case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateDxError:
-                case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateLampError:
-                case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateMotorError:
-                case WORKER_THREAD_OPERATION_000.WTO_FilmTrackTestError:
-                case WORKER_THREAD_OPERATION_000.WTO_DiagnosticsError:
-                case WORKER_THREAD_OPERATION_000.WTO_CorrectionsError:
-                case WORKER_THREAD_OPERATION_000.WTO_ExerciseSteppersError:
-                case WORKER_THREAD_OPERATION_000.WTO_LampWarmUpError:
-                case WORKER_THREAD_OPERATION_000.WTO_AdvanceFilmError:
-                case WORKER_THREAD_OPERATION_000.WTO_PutFilmGuidePositionError:
-                case WORKER_THREAD_OPERATION_000.WTO_PutFilmPressureRollersPositionError:
-                case WORKER_THREAD_OPERATION_000.WTO_FX35C_ManualRetractError:
-                case WORKER_THREAD_OPERATION_000.WTO_ScanError:
-                case WORKER_THREAD_OPERATION_000.WTO_ImportFromFileError:
-                case WORKER_THREAD_OPERATION_000.WTO_SaveError:
-                case WORKER_THREAD_OPERATION_000.WTO_TLXError:
-                    if (this.m_evTLXError != null)
-                    {
-                        this.m_evTLXError(wORKER_THREAD_OPERATION_, lStatus);
-                    }
-                    break;
-                case WORKER_THREAD_OPERATION_000.WTO_HardwareProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_HardwareError:
-                case WORKER_THREAD_OPERATION_000.WTO_HardwareAPSProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_HardwareAPSError:
-                    if (this.m_evTLXHardware != null)
-                    {
-                        this.m_evTLXHardware(wORKER_THREAD_OPERATION_, lStatus);
-                    }
-                    break;
-                case WORKER_THREAD_OPERATION_000.WTO_InitializeProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateApsProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateCcdProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateDxProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateLampProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateMotorProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_FilmTrackTestProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_DiagnosticsProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_CorrectionsProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_ExerciseSteppersProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_LampWarmUpProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_AdvanceFilmProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_PutFilmGuidePositionProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_PutFilmPressureRollersPositionProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_FX35C_ManualRetractProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_ScanProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_ImportFromFileProgress:
-                case WORKER_THREAD_OPERATION_000.WTO_TLXProgress:
-                    if (this.m_evTLXScanProgress != null)
-                    {
-                        this.m_evTLXScanProgress(wORKER_THREAD_OPERATION_, lStatus);
-                    }
-                    break;
-                case WORKER_THREAD_OPERATION_000.WTO_SaveProgress:
-                    switch (lStatus)
-                    {
-                        case 3000:
-                            ISave.ClientMemoryBufferDismissAll();
-                            Unsafe.Deallocate();
-                            break;
-                        default:
-                            Unsafe.ProcessBuffer(this);
-                            Unsafe.NextBuffer(this);
-                            break;
-                        case 0:
-                        case 1000:
-                            break;
-                    }
-                    if (this.m_evTLXSaveProgress != null)
-                    {
-                        this.m_evTLXSaveProgress(wORKER_THREAD_OPERATION_, lStatus);
-                    }
-                    break;
+            case WORKER_THREAD_OPERATION_000.WTO_InitializeError:
+            case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateApsError:
+            case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateCcdError:
+            case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateDxError:
+            case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateLampError:
+            case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateMotorError:
+            case WORKER_THREAD_OPERATION_000.WTO_FilmTrackTestError:
+            case WORKER_THREAD_OPERATION_000.WTO_DiagnosticsError:
+            case WORKER_THREAD_OPERATION_000.WTO_CorrectionsError:
+            case WORKER_THREAD_OPERATION_000.WTO_ExerciseSteppersError:
+            case WORKER_THREAD_OPERATION_000.WTO_LampWarmUpError:
+            case WORKER_THREAD_OPERATION_000.WTO_AdvanceFilmError:
+            case WORKER_THREAD_OPERATION_000.WTO_PutFilmGuidePositionError:
+            case WORKER_THREAD_OPERATION_000.WTO_PutFilmPressureRollersPositionError:
+            case WORKER_THREAD_OPERATION_000.WTO_FX35C_ManualRetractError:
+            case WORKER_THREAD_OPERATION_000.WTO_ScanError:
+            case WORKER_THREAD_OPERATION_000.WTO_ImportFromFileError:
+            case WORKER_THREAD_OPERATION_000.WTO_SaveError:
+            case WORKER_THREAD_OPERATION_000.WTO_TLXError:
+                if (this.m_evTLXError != null)
+                {
+                    this.m_evTLXError(wORKER_THREAD_OPERATION_, lStatus);
+                }
+                break;
+            case WORKER_THREAD_OPERATION_000.WTO_HardwareProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_HardwareError:
+            case WORKER_THREAD_OPERATION_000.WTO_HardwareAPSProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_HardwareAPSError:
+                if (this.m_evTLXHardware != null)
+                {
+                    this.m_evTLXHardware(wORKER_THREAD_OPERATION_, lStatus);
+                }
+                break;
+            case WORKER_THREAD_OPERATION_000.WTO_InitializeProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateApsProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateCcdProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateDxProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateLampProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateMotorProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_FilmTrackTestProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_DiagnosticsProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_CorrectionsProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_ExerciseSteppersProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_LampWarmUpProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_AdvanceFilmProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_PutFilmGuidePositionProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_PutFilmPressureRollersPositionProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_FX35C_ManualRetractProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_ScanProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_ImportFromFileProgress:
+            case WORKER_THREAD_OPERATION_000.WTO_TLXProgress:
+                if (this.m_evTLXScanProgress != null)
+                {
+                    this.m_evTLXScanProgress(wORKER_THREAD_OPERATION_, lStatus);
+                }
+                break;
+            case WORKER_THREAD_OPERATION_000.WTO_SaveProgress:
+                switch (lStatus)
+                {
+                    case 3000:
+                        ISave.ClientMemoryBufferDismissAll();
+                        Unsafe.Deallocate();
+                        break;
+                    default:
+                        Unsafe.ProcessBuffer(this);
+                        Unsafe.NextBuffer(this);
+                        break;
+                    case 0:
+                    case 1000:
+                        break;
+                }
+                if (this.m_evTLXSaveProgress != null)
+                {
+                    this.m_evTLXSaveProgress(wORKER_THREAD_OPERATION_, lStatus);
+                }
+                break;
             }
+
             return;
-        }
-        throw new ArgumentException("Callback operation invalid");
+
     }
 
     public virtual bool IsClosed()
