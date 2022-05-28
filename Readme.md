@@ -1,4 +1,5 @@
 _Intro_
+
 The Kodak Pakon has a SDK called TLX installed on the machine. This is a COM-server which contains all the low level functions needed for using a Pakon through software. At some point, there probably was some documentation distributed for using this as a client, and part of that documentation an example application came along, known as the TLXClientDemo. The UI is very bare bones because the Pakon developers just shoved exactly everything the COM-server was capable of doing in there, with a checkbox or radio button for every setting.
 
 Windows COM is old and forgotten but was pretty cool for its age. It is actually possible to do remote COM calls. And during the early 2000s the Pakon team probably thought that film scanners would have a long future yet, little did they know.. The SDK was probably not very popular among commercial users, just getting started was a bit too much and the payoff was that you could build your own software for scanning film. At some point the Pakon team saw that Microsoft .NET was gaining some serious traction, and being a programming language that is faster to get started with, they build their own interop layer between C# and the COM-server. A C# lib was probably also distributed at some point, luckily the internal Pakon Troubleshooting tool uses this lib and so it can be found as the Pakon.dll in the PTS directory.
@@ -13,6 +14,7 @@ _What we know_
 
 
 _Parameter naming_
+
 Are there some clues in the naming of parameters?
 iInitializeControl
 iSaveToMemoryTimeout
@@ -26,6 +28,7 @@ i_uiScanPacketReadTimeOut
 i_uiNoFilmTimeOut
 
 _Memory locations and reverse engineering_
+
 10013705 - tlx.dll entry
 Ghidra reverses the signature to:
 int InitializeScanner(HMODULE baseAddress,int iInitializeControl,undefined4 iSaveToMemoryTimeout)
