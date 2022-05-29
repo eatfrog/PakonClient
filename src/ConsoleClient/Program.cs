@@ -6,7 +6,9 @@ using TLXLib;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
-namespace pakontest3
+using PakonLib;
+using PakonLib.Enums;
+namespace ConsoleClient
 {
     class Program
     {

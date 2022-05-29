@@ -1,5 +1,6 @@
 ﻿using System;
 using TLXLib;
+using PakonLib.Enums;
 public class Global
 {
     public static int BufferSize(int nWidth, int nHeight, FILE_FORMAT_SAVE_TO_MEMORY_000 eMemoryFormat, bool bFourChannel)

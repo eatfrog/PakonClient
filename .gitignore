@@ -3,3 +3,4 @@ pakontest3.suo
 bin
 obj
 pakontest3/publish
+/src/*.suo

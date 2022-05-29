@@ -1,5 +1,5 @@
 ﻿// Pakon.IntBits
-using Pakon;
+using PakonLib;
 
 public class IntBits
 {

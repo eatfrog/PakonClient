@@ -1,7 +1,7 @@
 ﻿// Pakon.ISavePictures
 using TLXLib;
 
-namespace Pakon
+namespace PakonLib.Interfaces
 {
     public interface ISavePictures
     {

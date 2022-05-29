@@ -1,7 +1,9 @@
 ﻿// Pakon.ScannerSave
 using TLXLib;
+using PakonLib;
+using PakonLib.Interfaces;
 
-public class ScannerSave : Pakon.ISavePictures, Pakon.ISavePictures3
+public class ScannerSave : PakonLib.Interfaces.ISavePictures, PakonLib.Interfaces.ISavePictures3
 {
     private TLXMainClass m_csTLX = null;
 
