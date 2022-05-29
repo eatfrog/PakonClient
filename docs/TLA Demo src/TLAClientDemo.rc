@@ -1,0 +1,816 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\TLAClientDemo.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\TLAClientDemo.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 235, 55
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About TLAClientDemo"
+FONT 8, "MS Sans Serif"
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "Version ",IDC_STATIC,40,10,40,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2002",IDC_STATIC,40,25,119,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
+    LTEXT           "Static",IDC_VERSION,88,10,86,8
+END
+
+IDD_TLACLIENTDEMO_DIALOG DIALOGEX 0, 0, 454, 307
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "TLAClientDemo"
+MENU IDR_MAINFRAME
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Advance Film",IDC_ADVANCE_FILM,7,4,63,14
+    DEFPUSHBUTTON   "Scan",IDC_SCAN,7,20,63,14
+    PUSHBUTTON      "Cancel Scan",IDC_SCAN_CANCEL,7,36,63,14
+    PUSHBUTTON      "Move Oldest Roll in Scan Group To Save Group",
+                    IDC_MOVE_TO_SAVE_GROUP,7,68,63,30,BS_MULTILINE | 
+                    BS_NOTIFY
+    PUSHBUTTON      "Insert Picture",IDC_INSERT_PICTURE,7,100,63,14
+    PUSHBUTTON      "Delete Picture",IDC_DELETE_PICTURE,7,116,63,14
+    PUSHBUTTON      "Framing",IDC_FRAMING,7,132,63,14
+    PUSHBUTTON      "Color",IDC_COLOR,7,148,63,14
+    COMBOBOX        IDC_ROTATE_AMOUNT,7,164,63,63,CBS_DROPDOWNLIST | 
+                    WS_TABSTOP
+    PUSHBUTTON      "Rotate",IDC_ROTATE,7,178,63,14
+    PUSHBUTTON      "Save",IDC_SAVE,7,194,63,14
+    PUSHBUTTON      "Cancel Save",IDC_SAVE_CANCEL,7,210,63,14
+    PUSHBUTTON      "Release Rolls in Save Group",IDC_RELEASE_SAVE_GROUP,7,
+                    226,63,22,BS_MULTILINE
+    PUSHBUTTON      "Previous",IDC_PREVIOUS,245,230,50,14
+    PUSHBUTTON      "Next",IDC_NEXT,300,230,50,14
+    CONTROL         "",IDC_PICTURE,"Static",SS_ETCHEDFRAME,78,7,254,215
+    GROUPBOX        "Picture Attributes",IDC_STATIC,339,3,108,176,BS_CENTER
+    RTEXT           "Strip Number:",IDC_STATIC,352,26,44,8
+    EDITTEXT        IDC_STRIP_NUMBER,400,26,40,12,ES_AUTOHSCROLL | 
+                    ES_READONLY | NOT WS_TABSTOP
+    RTEXT           "Product:",IDC_STATIC,368,40,28,8
+    EDITTEXT        IDC_FILM_PRODUCT,400,40,40,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    RTEXT           "Specifier:",IDC_STATIC,366,56,30,8
+    EDITTEXT        IDC_FILM_SPECIFIER,400,56,40,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    RTEXT           "Frame Name:",IDC_STATIC,352,78,43,8
+    EDITTEXT        IDC_FRAME_NAME,400,78,40,12,ES_AUTOHSCROLL | ES_READONLY | 
+                    NOT WS_TABSTOP
+    RTEXT           "Frame Number:",IDC_STATIC,346,94,49,8
+    EDITTEXT        IDC_FRAME_NUMBER,400,94,40,12,ES_AUTOHSCROLL
+    RTEXT           "File Name:",IDC_STATIC,362,109,34,8
+    EDITTEXT        IDC_FILE_NAME,400,109,40,12,ES_AUTOHSCROLL
+    RTEXT           "Directory:",IDC_STATIC,364,123,31,8
+    EDITTEXT        IDC_DIRECTORY,400,123,40,12,ES_AUTOHSCROLL
+    CONTROL         "Not selected",IDC_NOT_SELECTED,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,384,142,56,10
+    CONTROL         "Selected",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,384,
+                    152,56,10
+    CONTROL         "Hidden",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,384,162,
+                    56,10
+    PUSHBUTTON      "Apply",IDC_APPLY,344,158,32,14,WS_GROUP
+    GROUPBOX        "Pictures Shown",IDC_STATIC,340,185,108,23,BS_CENTER
+    CONTROL         "One",IDC_PICTURE_MODE_ONE,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP | WS_TABSTOP,350,195,35,10
+    CONTROL         "Four",IDC_PICTURE_MODE_FOUR,"Button",BS_AUTORADIOBUTTON,
+                    405,195,35,10
+    RTEXT           "Current Picture:",IDC_STATIC,351,230,55,8
+    EDITTEXT        IDC_INDEX,411,230,25,12,ES_READONLY | NOT WS_BORDER | 
+                    NOT WS_TABSTOP
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,260,438,1
+    RTEXT           "Scan:",IDC_STATIC,10,270,20,10,SS_CENTERIMAGE
+    CTEXT           "Progress",IDC_SCAN_STATUS,32,270,97,10,SS_CENTERIMAGE
+    CONTROL         "Progress1",IDC_SCAN_PROGRESS,"msctls_progress32",
+                    PBS_SMOOTH | WS_BORDER,134,270,65,10
+    RTEXT           "Rolls in Scan Group:",IDC_STATIC,204,270,93,10,
+                    SS_CENTERIMAGE
+    EDITTEXT        IDC_SCAN_ROLL_COUNT,302,272,25,12,ES_READONLY | NOT 
+                    WS_BORDER | NOT WS_TABSTOP
+    RTEXT           "Save:",IDC_STATIC,10,289,20,10,SS_CENTERIMAGE
+    CTEXT           "Progress",IDC_SAVE_STATUS,32,289,97,10,SS_CENTERIMAGE
+    CONTROL         "Progress1",IDC_SAVE_PROGRESS,"msctls_progress32",
+                    PBS_SMOOTH | WS_BORDER,134,289,65,10
+    RTEXT           "Pictures in Save Group:",IDC_STATIC,205,289,93,10,
+                    SS_CENTERIMAGE
+    EDITTEXT        IDC_PICTURE_COUNT,302,289,25,12,ES_READONLY | NOT 
+                    WS_BORDER | NOT WS_TABSTOP
+    PUSHBUTTON      "Run Aid",IDC_RUN_AID,340,265,49,14,WS_GROUP
+    PUSHBUTTON      "Disconnect",IDC_CONNECT,340,285,49,14,WS_GROUP
+    PUSHBUTTON      "Quit",IDCANCEL,395,285,49,14,WS_GROUP
+    PUSHBUTTON      "Delete Roll...",IDC_DELETE_ROLL,7,52,63,14
+    LTEXT           "Test Count",IDC_TEST_COUNT,395,265,45,15
+    PUSHBUTTON      "Reset Leds",IDC_RESET_LEDS,80,230,49,14,WS_GROUP
+    CONTROL         "Load Firmware At Startup",IDC_LOAD_FIRMWARE_AT_STARTUP,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,230,100,10
+    CONTROL         "Self Test At Startup",IDC_SELF_TEST_AT_STARTUP,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,140,245,100,10
+END
+
+IDD_SCAN_DIALOG DIALOG DISCARDABLE  0, 0, 229, 282
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Scan Settings"
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "Film Format",IDC_STATIC,7,5,218,60
+    CONTROL         "35 mm",IDC_FILM_FORMAT_35MM,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP | WS_TABSTOP,15,20,37,10
+    CONTROL         "Optical",IDC_FILM_FORMAT_24MM,"Button",
+                    BS_AUTORADIOBUTTON,65,20,35,10
+    CONTROL         "MOF File",IDC_FILM_FORMAT_24MM_FILE,"Button",
+                    BS_AUTORADIOBUTTON,130,20,43,10
+    CONTROL         "Optical",IDC_FILM_FORMAT_24MM_CART,"Button",
+                    BS_AUTORADIOBUTTON,15,45,35,10
+    CONTROL         "MOF Reader",IDC_FILM_FORMAT_24MM_CART_MOF_READER,"Button",
+                    BS_AUTORADIOBUTTON,50,45,55,10
+    CONTROL         "MOF File",IDC_FILM_FORMAT_24MM_CART_MOF_FILE,"Button",
+                    BS_AUTORADIOBUTTON,105,45,40,10
+    CONTROL         "MOF File or Reader",
+                    IDC_FILM_FORMAT_24MM_CART_MOF_FILE_OR_READER,"Button",
+                    BS_AUTORADIOBUTTON,145,45,70,10
+    GROUPBOX        "24mm Extracted",IDC_STATIC,60,10,115,25
+    GROUPBOX        "24mm Cartidge",IDC_STATIC,10,35,210,25
+    GROUPBOX        "Film Color",IDC_STATIC,5,70,205,25
+    CONTROL         "Negative",IDC_FILM_COLOR_NEGATIVE,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,10,80,46,8
+    CONTROL         "Positive",IDC_FILM_COLOR_POSITIVE,"Button",
+                    BS_AUTORADIOBUTTON,70,80,39,8
+    CONTROL         "B&&W",IDC_FILM_COLOR_BnW,"Button",BS_AUTORADIOBUTTON,
+                    115,80,35,8
+    CONTROL         "B&&W C41",IDC_FILM_COLOR_BnW_C41,"Button",
+                    BS_AUTORADIOBUTTON,155,80,45,8
+    GROUPBOX        "Resolution",IDC_STATIC,5,99,205,25
+    CONTROL         "Base 4",IDC_RESOLUTION_LO,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP | WS_TABSTOP,11,110,53,10
+    CONTROL         "Base 8",IDC_RESOLUTION_HI,"Button",BS_AUTORADIOBUTTON,
+                    75,110,61,10
+    CONTROL         "Base 16",IDC_RESOLUTION_PLUS,"Button",
+                    BS_AUTORADIOBUTTON,145,110,56,10
+    GROUPBOX        "Frames Per Strip",IDC_STATIC,5,129,205,25
+    CONTROL         "Full Roll",IDC_FRAMES_PER_STRIP_0,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,13,139,46,8
+    CONTROL         "4 Frame",IDC_FRAMES_PER_STRIP_4,"Button",
+                    BS_AUTORADIOBUTTON,60,139,39,8
+    CONTROL         "5 Frame",IDC_FRAMES_PER_STRIP_5,"Button",
+                    BS_AUTORADIOBUTTON,105,139,40,8
+    CONTROL         "6 Frame",IDC_FRAMES_PER_STRIP_6,"Button",
+                    BS_AUTORADIOBUTTON,155,139,40,8
+    CONTROL         "Read DX",IDC_READ_DX,"Button",BS_AUTOCHECKBOX | 
+                    WS_DISABLED | WS_GROUP | WS_TABSTOP,10,160,75,10
+    CONTROL         "RFT Splice Mode",IDC_REEL_TO_REEL,"Button",
+                    BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,95,160,65,10
+    CONTROL         "Aggressive Framing",IDC_AGGRESSIVE_FRAMING,"Button",
+                    BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,10,175,75,10
+    CONTROL         "Scratch Removal",IDC_SCRATCH_REMOVAL,"Button",
+                    BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,95,175,65,10
+    CONTROL         "Lamp Warm Up",IDC_LAMP_WARM_UP,"Button",BS_AUTOCHECKBOX | 
+                    WS_GROUP | WS_TABSTOP,10,190,75,10
+    CONTROL         "Exercise Steppers",IDC_EXERCISE_STEPPERS,"Button",
+                    BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,95,190,65,10
+    CONTROL         "Film Drag",IDC_FILM_DRAG,"Button",BS_AUTOCHECKBOX | 
+                    WS_GROUP | WS_TABSTOP,170,160,40,10
+    PUSHBUTTON      "Reset Motor Speed Adjust",IDC_RESET_MOTOR_SPEED_ADJUST,
+                    115,205,50,20,BS_MULTILINE
+    PUSHBUTTON      "Import",IDC_IMPORT,170,205,50,20
+    PUSHBUTTON      "Film Track Test",IDC_DO_FILM_TRACK_TEST,5,230,49,20,
+                    BS_MULTILINE
+    PUSHBUTTON      "Set Film Track",IDC_FILM_TRACK,5,256,50,20
+    PUSHBUTTON      "Focus Correction",IDC_CORRECTIONS_FOCUS,60,230,50,20,
+                    BS_MULTILINE
+    PUSHBUTTON      "Focus Corr Advance Film",
+                    IDC_CORRECTIONS_FOCUS_ADVANCE_FILM,60,255,50,20,
+                    BS_MULTILINE
+    PUSHBUTTON      "Pre-Scan",IDC_PRE_SCAN,115,230,50,20
+    DEFPUSHBUTTON   "Scan",IDOK,115,256,50,19,WS_GROUP
+    PUSHBUTTON      "Gain Correction",IDC_GAIN_CORRECTIONS,7,206,50,20
+    PUSHBUTTON      "Cancel",IDCANCEL,170,256,50,19
+    PUSHBUTTON      "Fixed Pattern Correction",IDC_FP_CORRECTIONS,60,206,50,
+                    20,BS_MULTILINE
+END
+
+IDD_SAVE_DIALOG DIALOGEX 0, 0, 413, 279
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Save Settings"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Picture Selection",IDC_STATIC,5,5,241,40,WS_GROUP
+    CONTROL         "Current picture only",IDC_INDEX_CURRENT,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,14,15,77,10
+    CONTROL         "Selected pictures only (except hidden)",
+                    IDC_INDEX_SELECTED,"Button",BS_AUTORADIOBUTTON,110,15,
+                    136,10
+    CONTROL         "All pictures (except hidden)",IDC_INDEX_ALL,"Button",
+                    BS_AUTORADIOBUTTON,110,30,101,10
+    GROUPBOX        "Image Size",IDC_STATIC,5,50,241,70,WS_GROUP
+    CONTROL         "Original height and width",IDC_SAV_SIZE_ORIGINAL,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,14,62,93,10
+    CONTROL         "Sized for Displaying",IDC_SAV_SIZE_DISPLAY,"Button",
+                    BS_AUTORADIOBUTTON,14,76,77,10
+    CONTROL         "Sized for Saving",IDC_SAV_SIZE_SAVE,"Button",
+                    BS_AUTORADIOBUTTON,14,90,67,10
+    RTEXT           "DPI",IDC_STATIC,175,60,20,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_DPI,201,60,40,14,ES_AUTOHSCROLL | ES_NUMBER | 
+                    WS_GROUP
+    CONTROL         "Spin2",IDC_SPIN_DPI,"msctls_updown32",UDS_SETBUDDYINT | 
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | 
+                    UDS_NOTHOUSANDS | WS_GROUP,231,60,11,14
+    RTEXT           "Width",IDC_STATIC,165,80,30,14,SS_NOPREFIX | 
+                    SS_CENTERIMAGE
+    EDITTEXT        IDC_PICTURE_WIDTH,201,80,40,14,ES_AUTOHSCROLL | 
+                    ES_NUMBER | WS_GROUP
+    RTEXT           "Height",IDC_STATIC,165,100,30,14,SS_NOPREFIX | 
+                    SS_CENTERIMAGE
+    EDITTEXT        IDC_PICTURE_HEIGHT,201,100,40,14,ES_AUTOHSCROLL | 
+                    ES_NUMBER | WS_GROUP
+    GROUPBOX        "Rotation",IDC_STATIC,7,126,241,40,WS_GROUP
+    CONTROL         "Use current",IDC_ROTATE_CURRENT,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,14,136,60,8
+    CONTROL         "Apply new rotation",IDC_ROTATE_NEW,"Button",
+                    BS_AUTORADIOBUTTON,14,150,75,10
+    CONTROL         "Mirror",IDC_MIRROR,"Button",BS_AUTOCHECKBOX | WS_GROUP | 
+                    WS_TABSTOP,138,135,101,10
+    RTEXT           "New rotation",IDC_STATIC,121,148,56,12,SS_CENTERIMAGE
+    COMBOBOX        IDC_ROTATE_NEW_AMOUNT,182,148,57,52,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP,WS_EX_RIGHT
+    GROUPBOX        "Other Options",IDC_STATIC,5,171,241,101,WS_GROUP
+    CONTROL         "Use low resolution buffer for a faster save when quality is not required",
+                    IDC_SAV_USE_LO_RES_BUFFER,"Button",BS_AUTOCHECKBOX | 
+                    BS_MULTILINE | WS_GROUP | WS_TABSTOP,14,185,228,16
+    CONTROL         "Use Scratch Removal (if available)",
+                    IDC_SAV_USE_SCRATCH_REMOVAL,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,14,205,175,10
+    CONTROL         "Use Color Correction (12 bit RPD)",
+                    IDC_SAV_USE_COLOR_CORRECTION,"Button",BS_AUTOCHECKBOX | 
+                    BS_MULTILINE | WS_TABSTOP,14,220,225,10
+    CONTROL         "Use Color Scene Balance Algorithm (8 bit sRGB)",
+                    IDC_SAV_USE_COLOR_SCENE_BALANCE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,14,235,225,10
+    CONTROL         "Use Color Adjustments (apply color sliders adjustments)",
+                    IDC_SAV_USE_COLOR_ADJUSTMENTS,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,14,250,225,10
+    GROUPBOX        "Type of Save Operation",IDC_STATIC,253,5,153,40,
+                    WS_GROUP
+    CONTROL         "To Disk",IDC_SAV_METHOD_DISK,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,260,16,41,10
+    CONTROL         "To Shared Memory",IDC_SAV_METHOD_MEMORY_SHARED,"Button",
+                    BS_AUTORADIOBUTTON | WS_DISABLED,316,15,76,10
+    CONTROL         "To Client Memory",IDC_SAV_METHOD_MEMORY_CLIENT,"Button",
+                    BS_AUTORADIOBUTTON,316,30,71,10
+    GROUPBOX        "File (Save To Disk)",IDC_STATIC,253,50,153,55,WS_GROUP
+    RTEXT           "Type",IDC_STATIC,260,65,19,12,SS_CENTERIMAGE
+    COMBOBOX        IDC_FILE_FORMAT_TYPE,288,64,112,52,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    RTEXT           "Compression",IDC_STATIC,261,82,41,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_COMPRESSION,311,81,40,14,ES_AUTOHSCROLL | ES_NUMBER | 
+                    WS_GROUP
+    CONTROL         "Spin1",IDC_SPIN_COMPRESSION,"msctls_updown32",
+                    UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | 
+                    UDS_ARROWKEYS | UDS_NOTHOUSANDS | WS_GROUP,341,81,11,14
+    GROUPBOX        "File (SaveToMemory)",IDC_STATIC,253,110,153,87,WS_GROUP
+    CONTROL         "Planar",IDC_PLANAR,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP | WS_TABSTOP,260,121,36,10
+    CONTROL         "8-Bit DIB",IDC_8BIT_DIB,"Button",BS_AUTORADIOBUTTON,260,
+                    149,44,10
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ | WS_GROUP,261,139,
+                    138,1
+    CONTROL         "Add File Header",IDC_SAV_PLANAR_FILE_HEADER,"Button",
+                    BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,319,122,67,10
+    CONTROL         "Add File Header",IDC_SAV_DIB_FILE_HEADER,"Button",
+                    BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,319,149,67,10
+    CONTROL         "Use Top Down DIB",IDC_SAV_TOP_DOWN_DIB,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,319,164,78,10
+    CONTROL         "Fast Updates",IDC_SAV_FAST_UPDATES,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,319,180,58,10
+    DEFPUSHBUTTON   "OK",IDOK,297,258,50,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,356,258,50,14
+    CONTROL         "Use Worker Thread",IDC_USE_WORKER_THREAD,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,253,209,153,10
+END
+
+IDD_PRE_SCAN_DIALOG DIALOG DISCARDABLE  0, 0, 195, 145
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Pre-Scan Framing Adjust"
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "Framing",IDC_STATIC,7,7,87,98
+    EDITTEXT        IDC_EDIT_HIGH_RES_HEIGHT,14,20,30,12,ES_AUTOHSCROLL | 
+                    ES_READONLY | ES_NUMBER
+    EDITTEXT        IDC_EDIT_HIGH_RES_HEIGHT_MM,56,20,30,12,ES_AUTOHSCROLL | 
+                    ES_READONLY | ES_NUMBER
+    CTEXT           "Height\n(Pixels)",IDC_STATIC,14,35,30,18
+    CTEXT           "Height\n(mm * 1000)",IDC_STATIC,52,35,38,18
+    EDITTEXT        IDC_EDIT_WIDTH,14,60,30,12,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_WIDTH_UNIT,56,60,30,12,ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    CTEXT           "Width\n(Pixels)",IDC_STATIC,14,75,30,18
+    CTEXT           "Unit Width\n(Pixels)",IDC_STATIC,56,75,30,27
+    GROUPBOX        "Cropping",IDC_STATIC,101,7,87,98
+    EDITTEXT        IDC_EDIT_LEFT,108,20,30,12,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_RIGHT,151,20,30,12,ES_AUTOHSCROLL | ES_NUMBER
+    CTEXT           "Left (Pixels)",IDC_STATIC,108,35,30,18
+    CTEXT           "Right (Pixels)",IDC_STATIC,151,35,30,18
+    EDITTEXT        IDC_EDIT_TOP,108,60,30,12,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_BOTTOM,150,60,30,12,ES_AUTOHSCROLL | ES_NUMBER
+    CTEXT           "Top (Pixels)",IDC_STATIC,108,75,30,18
+    CTEXT           "Bottom (Pixels)",IDC_STATIC,150,75,30,18
+    DEFPUSHBUTTON   "OK",IDOK,24,124,50,14
+    PUSHBUTTON      "Reset",ID_RESET,81,124,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,138,124,50,14
+END
+
+IDD_FRAME_DIALOG DIALOG DISCARDABLE  0, 0, 190, 146
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Framing Adjustment"
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "High Resolution",IDC_STATIC,79,7,89,100
+    RTEXT           "Left:",IDC_STATIC,97,21,15,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_HR_LEFT,120,21,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    RTEXT           "Top:",IDC_STATIC,96,42,16,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_HR_TOP,120,42,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    RTEXT           "Right:",IDC_STATIC,92,63,20,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_HR_RIGHT,120,63,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    RTEXT           "Bottom:",IDC_STATIC,87,85,25,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_HR_BOTTOM,120,85,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Adjust Framing",IDC_FRAME_OP_ADJUST,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,7,55,62,10
+    CONTROL         "Adjust Cropping",IDC_FRAME_OP_CROP,"Button",
+                    BS_AUTORADIOBUTTON,7,70,65,10
+    DEFPUSHBUTTON   "OK",IDOK,9,123,52,16
+    PUSHBUTTON      "Apply",IDC_APPLY,69,123,52,16,WS_DISABLED
+    PUSHBUTTON      "Reset",IDC_RESET,7,21,52,16
+    PUSHBUTTON      "Cancel",IDCANCEL,131,123,52,16
+    EDITTEXT        IDC_EDIT1,53,98,15,12,ES_AUTOHSCROLL | ES_READONLY | NOT 
+                    WS_BORDER
+    LTEXT           "Framing Risk:",IDC_STATIC,7,98,44,8
+END
+
+IDD_COLOR_DIALOG DIALOG DISCARDABLE  0, 0, 204, 132
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Color Adjustment"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,75,110,50,14
+    CONTROL         "Slider1",IDC_SLIDER_R,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,48,9,130,10
+    LTEXT           "Red",IDC_STATIC,23,9,14,8
+    CONTROL         "Slider1",IDC_SLIDER_G,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,48,25,130,10
+    LTEXT           "Green",IDC_STATIC,17,25,20,8
+    CONTROL         "Slider1",IDC_SLIDER_B,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,48,41,130,10
+    LTEXT           "Blue",IDC_STATIC,22,41,15,8
+    CONTROL         "Slider1",IDC_SLIDER_D,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,48,57,130,10
+    LTEXT           "Brightness",IDC_STATIC,3,57,34,8
+    CONTROL         "Slider1",IDC_SLIDER_C,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,48,73,130,10
+    LTEXT           "Contrast",IDC_STATIC,10,73,27,8
+    CONTROL         "Slider1",IDC_SLIDER_SHARPNESS,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,48,89,130,10
+    LTEXT           "Sharpness",IDC_STATIC,10,89,27,8
+END
+
+IDD_ADVANCE_MOTOR DIALOG DISCARDABLE  0, 0, 158, 197
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Advance Motor"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_MILLISECONDS,14,18,40,12,ES_RIGHT | ES_AUTOHSCROLL
+    EDITTEXT        IDC_SPEED,14,96,40,15,ES_RIGHT | ES_AUTOHSCROLL
+    CONTROL         "Spin1",IDC_SPIN_SPEED,"msctls_updown32",UDS_SETBUDDYINT | 
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | 
+                    UDS_NOTHOUSANDS,43,95,11,15
+    DEFPUSHBUTTON   "OK",IDOK,44,176,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,101,176,50,14
+    LTEXT           "milliseconds",IDC_STATIC,66,21,38,8
+    LTEXT           "Effective Range for Speed:\n\t- Forward is from  10 to 355\n\t- Reverse is from -10 to -355\n0 is an invalid number",
+                    IDC_STATIC,14,114,129,39
+    LTEXT           "Tenths of mm/sec",IDC_STATIC,66,98,58,8
+    LTEXT           "Valid numbers for Advance Time:\n\t- Minus one runs until cancelled\n\t- Positve number of milliseconds\n0 is an invalid number",
+                    IDC_STATIC,14,34,129,37
+    GROUPBOX        "Duration",IDC_STATIC,7,7,144,72
+    GROUPBOX        "Speed",IDC_STATIC,7,83,144,74
+END
+
+IDD_DELETE_ROLL DIALOG DISCARDABLE  0, 0, 177, 81
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Delete Roll"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_DELETE_ROLL_INDEX,75,20,35,15,ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    CONTROL         "Spin1",IDC_SPIN_ROLL,"msctls_updown32",UDS_SETBUDDYINT | 
+                    UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,110,20,15,
+                    15
+    PUSHBUTTON      "Delete",IDOK,25,50,50,14
+    DEFPUSHBUTTON   "Close",IDCANCEL,100,50,50,14
+    LTEXT           "Roll:",IDC_STATIC,55,20,20,15
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 0,0,30,2
+ PRODUCTVERSION 0,0,30,2
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "\0"
+            VALUE "CompanyName", "Pakon, Inc\0"
+            VALUE "FileDescription", "TLAClientDemo MFC Application\0"
+            VALUE "FileVersion", "0, 0, 30, 2\0"
+            VALUE "InternalName", "TLAClientDemo\0"
+            VALUE "LegalCopyright", "Copyright 2001-2002 Pakon, Inc.\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "TLAClientDemo.EXE\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "TLAClientDemo Application\0"
+            VALUE "ProductVersion", "0, 0, 30, 2\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_TLACLIENTDEMO_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 447
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 300
+    END
+
+    IDD_SCAN_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 222
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 275
+    END
+
+    IDD_SAVE_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 406
+        VERTGUIDE, 14
+        VERTGUIDE, 239
+        VERTGUIDE, 246
+        VERTGUIDE, 253
+        VERTGUIDE, 260
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 272
+    END
+
+    IDD_PRE_SCAN_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 188
+        VERTGUIDE, 14
+        VERTGUIDE, 181
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 138
+    END
+
+    IDD_FRAME_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 183
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 139
+    END
+
+    IDD_COLOR_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 197
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 125
+    END
+
+    IDD_ADVANCE_MOTOR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 151
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 190
+    END
+
+    IDD_DELETE_ROLL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 170
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 74
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_SAVE_DIALOG DLGINIT
+BEGIN
+    IDC_ROTATE_NEW_AMOUNT, 0x403, 2, 0
+0x0030, 
+    IDC_ROTATE_NEW_AMOUNT, 0x403, 8, 0
+0x3039, 0x4c20, 0x6665, 0x0074, 
+    IDC_ROTATE_NEW_AMOUNT, 0x403, 4, 0
+0x3831, 0x0030, 
+    IDC_ROTATE_NEW_AMOUNT, 0x403, 9, 0
+0x3039, 0x5220, 0x6769, 0x7468, "\000" 
+    IDC_FILE_FORMAT_TYPE, 0x403, 12, 0
+0x504a, 0x4745, 0x2820, 0x6a2e, 0x6770, 0x0029, 
+    IDC_FILE_FORMAT_TYPE, 0x403, 14, 0
+0x6942, 0x6d74, 0x7061, 0x2820, 0x622e, 0x706d, 0x0029, 
+    IDC_FILE_FORMAT_TYPE, 0x403, 12, 0
+0x4954, 0x4646, 0x2820, 0x742e, 0x6669, 0x0029, 
+    IDC_FILE_FORMAT_TYPE, 0x403, 13, 0
+0x5845, 0x4649, 0x2820, 0x6a2e, 0x6770, 0x2029, "\000" 
+    0
+END
+
+IDD_TLACLIENTDEMO_DIALOG DLGINIT
+BEGIN
+    IDC_ROTATE_AMOUNT, 0x403, 8, 0
+0x3039, 0x4c20, 0x6665, 0x0074, 
+    IDC_ROTATE_AMOUNT, 0x403, 4, 0
+0x3831, 0x0030, 
+    IDC_ROTATE_AMOUNT, 0x403, 9, 0
+0x3039, 0x5220, 0x6769, 0x7468, "\000" 
+    IDC_ROTATE_AMOUNT, 0x403, 7, 0
+0x694d, 0x7272, 0x726f, "\000" 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU DISCARDABLE 
+BEGIN
+    POPUP "Pre-Scan"
+    BEGIN
+        MENUITEM "35mm 4 Base",                 ID_PRESCAN_35MM4BASE
+        MENUITEM "35mm 8 Base",                 ID_PRESCAN_35MM8BASE
+        MENUITEM "35mm 16 Base",                ID_PRESCAN_35MM16BASE
+        MENUITEM "24mm 4Base",                  ID_PRESCAN_24MM4BASE
+        MENUITEM "24mm 8 Base",                 ID_PRESCAN_24MM8BASE
+        MENUITEM "24mm 16 Base",                ID_PRESCAN_24MM16BASE
+    END
+    POPUP "&Control"
+    BEGIN
+        MENUITEM "Lamp &off",                   ID_CONTROL_LAMPOFF
+        MENUITEM "Lamp &dim",                   ID_CONTROL_LAMPDIM
+        MENUITEM "&Lamp on",                    ID_CONTROL_LAMPON
+        MENUITEM SEPARATOR
+        MENUITEM "&Rollers release",            ID_CONTROL_ROLLERSRELEASE
+        MENUITEM SEPARATOR
+        MENUITEM "&Aps Manual Retract",         ID_CONTROL_APSMANUALRETRACT
+        MENUITEM "D&elete Oldest Mof File",     ID_CONTROL_DELETE_OLDEST_MOF_ROLL
+
+    END
+    POPUP "Help"
+    BEGIN
+        MENUITEM "About",                       ID_HELP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_ABOUTBOX            "&About TLAClientDemo..."
+    IDS_COM_ERROR_TITLE     "F235 COM Server Error"
+    IDS_COM_ERROR01         "Invalid Pointer To Client Callback"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_PRESCAN_35MM4BASE    "Change the framing parameters."
+    IDM_SCANNER_INFO_000    "Change the framing parameters."
+    ID_PRESCAN_35MM16BASE   "Change the framing parameters."
+    ID_PRESCAN_24MM4BASE    "Change the framing parameters."
+    ID_PRESCAN_24MM8BASE    "Change the framing parameters."
+    ID_PRESCAN_24MM16BASE   "Change the framing parameters."
+    ID_HELP_ABOUT           "Information about TLAClientDemo"
+    IDS_COM_ERROR_FILM_GUIDES "Turns off the scanner's lamp"
+    ID_CONTROL_LAMPDIM      "Dims the scanner's lamp"
+    ID_CONTROL_LAMPON       "Turns on the scanner's lamp"
+    ID_CONTROL_ROLLERSRELEASE "Disengages the scanner's pinch rollers"
+    ID_CONTROL_APSMANUALRETRACT "Stop retraction by pressing Cancel Scan"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_COM_ERROR02         "Worker Thread Already Exists"
+    IDS_COM_ERROR03         "QueryInterface for Client CallBack"
+    IDS_COM_ERROR04         "CoMarshalInterThreadInterfaceInStream"
+    IDS_COM_ERROR05         "Unable To Create Worker Thread"
+    IDS_COM_ERROR06         "WorkerThreadCoInitialize"
+    IDS_COM_ERROR07         "Worker Thread CoGetInterfaceAndReleaseStream"
+    IDS_COM_ERROR08         "Worker Thread Client Signal"
+    IDS_COM_ERROR09         "Worker Thread Start Timeout"
+    IDS_COM_ERROR10         "Scanner Not Initialized"
+    IDS_COM_ERROR11         "No Pictures Or Strips"
+    IDS_COM_ERROR12         "Too Many Rolls"
+    IDS_COM_ERROR13         "Invalid Index"
+    IDS_COM_ERROR14         "Invalid Member Variable"
+    IDS_COM_ERROR15         "Invalid Parameter"
+    IDS_COM_ERROR16         "No Worker Thread For Multiple SaveToMemory"
+    IDS_COM_ERROR17         "No Client Memory Buffer"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_COM_ERROR18         "One File Name For Multiple Saves"
+    IDS_COM_ERROR19         "Start Up Error"
+    IDS_COM_ERROR20         "CBAdvise Already Called"
+    IDS_COM_ERROR21         "CBAdvise Not Called"
+    IDS_COM_ERROR22         "Initialize Scanner Already Called"
+    IDS_COM_ERROR23         "Motor Adjust Speed is Zero"
+    IDS_COM_ERROR24         "This function is not implemented in the hardware."
+    IDS_COM_ERROR25         "Previous Error"
+    IDS_COM_ERROR26         "Call Enable Full Calibration"
+    IDS_COM_ERROR27         "File Name List Empty"
+    IDS_COM_ERROR28         "Lamp Error"
+    IDS_COM_ERROR29         "Changing Frame Number With Aps"
+    IDS_COM_ERROR30         "Not Allowed With Aps"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_COM_ERROR_PRESSURE_ROLLERS "WTO_PutFilmPressureRollersPositionError"
+    IDS_COM_ERROR_HARDWARE_APS "WTO_HardwareAPSError"
+    IDS_COM_ERROR_INITIALIZE "WTO_InitializeError"
+    IDS_COM_ERROR_HARDWARE  "WTO_HardwareError"
+    IDS_COM_ERROR_LAMP_WARMUP "WTO_LampWarmUpError"
+    IDS_COM_ERROR_F235C_MANUALRETRACT "WTO_F235C_ManualRetractError"
+    IDS_COM_ERROR_FIRMWARE_APS "WTO_FirmwareUpdateApsError"
+    IDS_COM_ERROR_FIRMWARE_CCD "WTO_FirmwareUpdateCcdError"
+    IDS_COM_ERROR_FIRMWARE_DX "WTO_FirmwareUpdateDxError"
+    IDS_COM_ERROR_FIRMWARE_LAMP "WTO_FirmwareUpdateLampError"
+    IDS_COM_ERROR_FIRMWARE_MOTOR "WTO_FirmwareUpdateMotorError"
+    IDS_COM_ERROR_EXERCISE_STEPPERS "WTO_ExerciseSteppersError"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_COM_ERROR_SCAN      "WTO_ScanError"
+    IDS_COM_ERROR_SAVE      "WTO_SaveError"
+    IDS_COM_ERROR_SHUTDOWN  "The application will shut down now"
+    IDS_COM_ERROR_ADVANCE_FILM "WTO_AdvanceFilmError"
+    IDS_COM_ERROR_NO_DATA   "Error reported improperly"
+    IDS_COM_ERROR_CORRECTIONS "WTO_Corrections"
+    IDS_COM_ERROR_TRACK_TEST "Track test puked."
+    IDS_COM_ERROR_IMPORT    "WTO_ImportError"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_CONTROL_DELETE_OLDEST_MOF_ROLL 
+                            "I Think I'll Delete The Oldest MOF File Now"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\TLAClientDemo.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

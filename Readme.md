@@ -7,7 +7,7 @@ Windows COM is old and forgotten but was pretty cool for its age. It is actually
 Through a disassembler it is possible to reverse engineer the Pakon.dll and get some well needed clues as to how to work with a Pakon through software. And through the reverse engineering software [Ghidra](https://ghidra-sre.org/) it is possible to gain some insights into TLX.dll.
 
 _What we know_
-- TLA, TLB, TLC, TLX are COM DLL:s that TLXClientDemo interfaces with
+- TLA, TLB, TLC, TLX are COM DLL:s that TLXClientDemo interfaces with. Before TLXClientDemo there was a TLAClientDemo. There is a reference manual for TLA in the docs folder.
 - TLXClientDemo is a demonstration app that you can run the Pakon without using the official software
 - Pakon.dll is a .NET library for using TLX that can be found in the PTS folder. This can be quite easily reverse engineered with for example [ILSpy](https://github.com/icsharpcode/ILSpy)
 - But development for Windows XP is tricky today, best to run an old version of VS2010 on the same virtual machine as the Pakon is running on

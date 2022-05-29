@@ -1,0 +1,372 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: PSIF235 - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\JNIENH~1\LOCALS~1\Temp\RSP237.bat" with contents
+[
+@echo off
+start /wait hcw /C /E /M "hlp\PSIF235.hpj"
+if errorlevel 1 goto :Error
+if not exist "hlp\PSIF235.hlp" goto :Error
+copy "hlp\PSIF235.hlp" .\Release
+goto :done
+:Error
+echo hlp\PSIF235.hpj(1) : error:
+type "hlp\PSIF235.log"
+:done
+]
+Creating command line "C:\DOCUME~1\JNIENH~1\LOCALS~1\Temp\RSP237.bat"
+Creating command line "rc.exe /l 0x409 /fo"Release/PSIF235.res" /d "NDEBUG" /d "_AFXDLL" "C:\Data\ATL_COM\PSIF235\PSIF235.rc"" 
+Making help file...
+        1 file(s) copied.
+Creating temporary file "C:\DOCUME~1\JNIENH~1\LOCALS~1\Temp\RSP238.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_UNICODE" /FR"Release/" /Fp"Release/PSIF235.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"C:\Data\ATL_COM\PSIF235\CalibrationPages.cpp"
+"C:\Data\ATL_COM\PSIF235\CalibrationSheet.cpp"
+"C:\Data\ATL_COM\PSIF235\CallBackClient.cpp"
+"C:\Data\ATL_COM\PSIF235\ClassicView.cpp"
+"C:\Data\ATL_COM\PSIF235\ClientBuffers.cpp"
+"C:\Data\ATL_COM\PSIF235\DiskProductSettingsPages.cpp"
+"C:\Data\ATL_COM\PSIF235\DiskProductSettingsSheet.cpp"
+"C:\Data\ATL_COM\PSIF235\DlgColorAdjust.cpp"
+"C:\Data\ATL_COM\PSIF235\DlgContactSetup.cpp"
+"C:\Data\ATL_COM\PSIF235\DlgEditIndexNumber.cpp"
+"C:\Data\ATL_COM\PSIF235\DlgFrameAdjust.cpp"
+"C:\Data\ATL_COM\PSIF235\DlgKpcdAccessCode.cpp"
+"C:\Data\ATL_COM\PSIF235\DlgProducts.cpp"
+"C:\Data\ATL_COM\PSIF235\DlgSetImageSize.cpp"
+"C:\Data\ATL_COM\PSIF235\DLLMain.cpp"
+"C:\Data\ATL_COM\PSIF235\FileFormats.cpp"
+"C:\Data\ATL_COM\PSIF235\GeneralSettings.cpp"
+"C:\Data\ATL_COM\PSIF235\GeneralSettingsPages.cpp"
+"C:\Data\ATL_COM\PSIF235\GeneralSettingsSheet.cpp"
+"C:\Data\ATL_COM\PSIF235\globals.cpp"
+"C:\Data\ATL_COM\PSIF235\IQSettingsPages.cpp"
+"C:\Data\ATL_COM\PSIF235\IQSettingsSheet.cpp"
+"C:\Data\ATL_COM\PSIF235\IQueue.cpp"
+"C:\Data\ATL_COM\PSIF235\LogFile.cpp"
+"C:\Data\ATL_COM\PSIF235\MainFrm.cpp"
+"C:\Data\ATL_COM\PSIF235\MainFrmOrder.cpp"
+"C:\Data\ATL_COM\PSIF235\MainFrmProducts.cpp"
+"C:\Data\ATL_COM\PSIF235\MainFrmSetup.cpp"
+"C:\Data\ATL_COM\PSIF235\Order.cpp"
+"C:\Data\ATL_COM\PSIF235\OrderEditPictures.cpp"
+"C:\Data\ATL_COM\PSIF235\PakonGrid.cpp"
+"C:\Data\ATL_COM\PSIF235\Picture.cpp"
+"C:\Data\ATL_COM\PSIF235\Pictures.cpp"
+"C:\Data\ATL_COM\PSIF235\Products.cpp"
+"C:\Data\ATL_COM\PSIF235\PSIF235.cpp"
+"C:\Data\ATL_COM\PSIF235\PSIF235Doc.cpp"
+"C:\Data\ATL_COM\PSIF235\RollID.cpp"
+"C:\Data\ATL_COM\PSIF235\scandlg.cpp"
+"C:\Data\ATL_COM\PSIF235\ScannerSettings.cpp"
+"C:\Data\ATL_COM\PSIF235\ScrollEdit.cpp"
+"C:\Data\ATL_COM\PSIF235\UGCTPicture.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\JNIENH~1\LOCALS~1\Temp\RSP238.tmp" 
+Creating temporary file "C:\DOCUME~1\JNIENH~1\LOCALS~1\Temp\RSP239.tmp" with contents
+[
+/nologo /entry:"wWinMainCRTStartup" /subsystem:windows /incremental:no /pdb:"Release/PSIF235.pdb" /machine:I386 /out:"Release/PSIF235.exe" 
+.\Release\CalibrationPages.obj
+.\Release\CalibrationSheet.obj
+.\Release\CallBackClient.obj
+.\Release\ClassicView.obj
+.\Release\ClientBuffers.obj
+.\Release\ComboBoxAutoFill.obj
+.\Release\DiskProductSettingsPages.obj
+.\Release\DiskProductSettingsSheet.obj
+.\Release\DlgColorAdjust.obj
+.\Release\DlgContactSetup.obj
+.\Release\DlgEditIndexNumber.obj
+.\Release\DlgFolder.obj
+.\Release\DlgFrameAdjust.obj
+.\Release\DlgKpcdAccessCode.obj
+.\Release\DlgProducts.obj
+.\Release\DlgSetImageSize.obj
+.\Release\DLLMain.obj
+.\Release\FileFormats.obj
+.\Release\GeneralSettings.obj
+.\Release\GeneralSettingsPages.obj
+.\Release\GeneralSettingsSheet.obj
+.\Release\globals.obj
+.\Release\IQSettingsPages.obj
+.\Release\IQSettingsSheet.obj
+.\Release\IQueue.obj
+.\Release\LogFile.obj
+.\Release\MainFrm.obj
+.\Release\MainFrmOrder.obj
+.\Release\MainFrmProducts.obj
+.\Release\MainFrmSetup.obj
+.\Release\MrdRecSet.obj
+.\Release\Order.obj
+.\Release\OrderEditPictures.obj
+.\Release\PakonGrid.obj
+.\Release\Picture.obj
+.\Release\Pictures.obj
+.\Release\Products.obj
+.\Release\PSIF235.obj
+.\Release\PSIF235Doc.obj
+.\Release\RollID.obj
+.\Release\scandlg.obj
+.\Release\ScannerSettings.obj
+.\Release\ScrollEdit.obj
+.\Release\StdAfx.obj
+.\Release\UGCBType.obj
+.\Release\UGCell.obj
+.\Release\UGCelTyp.obj
+.\Release\UGCnrBtn.obj
+.\Release\UGCTarrw.obj
+.\Release\UGCTPicture.obj
+.\Release\UGCtrl.obj
+.\Release\UGDLType.obj
+.\Release\UGDrgDrp.obj
+.\Release\UGDrwHnt.obj
+.\Release\UGDtaSrc.obj
+.\Release\UGEdit.obj
+.\Release\ugexcel.obj
+.\Release\ugformat.obj
+.\Release\uggdinfo.obj
+.\Release\UGGrid.obj
+.\Release\UGHint.obj
+.\Release\ughscrol.obj
+.\Release\ugLstBox.obj
+.\Release\UGMemMan.obj
+.\Release\UGMultiS.obj
+.\Release\ugprint.obj
+.\Release\ugptrlst.obj
+.\Release\ugsidehd.obj
+.\Release\ugtab.obj
+.\Release\UGTopHdg.obj
+.\Release\ugvscrol.obj
+.\Release\PSIF235.res
+]
+Creating command line "link.exe @C:\DOCUME~1\JNIENH~1\LOCALS~1\Temp\RSP239.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+CalibrationPages.cpp
+CalibrationSheet.cpp
+CallBackClient.cpp
+ClassicView.cpp
+ClientBuffers.cpp
+DiskProductSettingsPages.cpp
+DiskProductSettingsSheet.cpp
+DlgColorAdjust.cpp
+DlgContactSetup.cpp
+DlgEditIndexNumber.cpp
+DlgFrameAdjust.cpp
+DlgKpcdAccessCode.cpp
+DlgProducts.cpp
+DlgSetImageSize.cpp
+DLLMain.cpp
+FileFormats.cpp
+GeneralSettings.cpp
+GeneralSettingsPages.cpp
+GeneralSettingsSheet.cpp
+globals.cpp
+Generating Code...
+Compiling...
+IQSettingsPages.cpp
+IQSettingsSheet.cpp
+IQueue.cpp
+LogFile.cpp
+MainFrm.cpp
+MainFrmOrder.cpp
+MainFrmProducts.cpp
+MainFrmSetup.cpp
+Order.cpp
+OrderEditPictures.cpp
+PakonGrid.cpp
+Picture.cpp
+Pictures.cpp
+Products.cpp
+PSIF235.cpp
+PSIF235Doc.cpp
+RollID.cpp
+scandlg.cpp
+ScannerSettings.cpp
+ScrollEdit.cpp
+Generating Code...
+Compiling...
+UGCTPicture.cpp
+Generating Code...
+Linking...
+Creating temporary file "C:\DOCUME~1\JNIENH~1\LOCALS~1\Temp\RSP23C.tmp" with contents
+[
+/nologo /o"Release/PSIF235.bsc" 
+.\Release\StdAfx.sbr
+.\Release\CalibrationPages.sbr
+.\Release\CalibrationSheet.sbr
+.\Release\CallBackClient.sbr
+.\Release\ClassicView.sbr
+.\Release\ClientBuffers.sbr
+.\Release\ComboBoxAutoFill.sbr
+.\Release\DiskProductSettingsPages.sbr
+.\Release\DiskProductSettingsSheet.sbr
+.\Release\DlgColorAdjust.sbr
+.\Release\DlgContactSetup.sbr
+.\Release\DlgEditIndexNumber.sbr
+.\Release\DlgFolder.sbr
+.\Release\DlgFrameAdjust.sbr
+.\Release\DlgKpcdAccessCode.sbr
+.\Release\DlgProducts.sbr
+.\Release\DlgSetImageSize.sbr
+.\Release\DLLMain.sbr
+.\Release\FileFormats.sbr
+.\Release\GeneralSettings.sbr
+.\Release\GeneralSettingsPages.sbr
+.\Release\GeneralSettingsSheet.sbr
+.\Release\globals.sbr
+.\Release\IQSettingsPages.sbr
+.\Release\IQSettingsSheet.sbr
+.\Release\IQueue.sbr
+.\Release\LogFile.sbr
+.\Release\MainFrm.sbr
+.\Release\MainFrmOrder.sbr
+.\Release\MainFrmProducts.sbr
+.\Release\MainFrmSetup.sbr
+.\Release\MrdRecSet.sbr
+.\Release\Order.sbr
+.\Release\OrderEditPictures.sbr
+.\Release\PakonGrid.sbr
+.\Release\Picture.sbr
+.\Release\Pictures.sbr
+.\Release\Products.sbr
+.\Release\PSIF235.sbr
+.\Release\PSIF235Doc.sbr
+.\Release\RollID.sbr
+.\Release\scandlg.sbr
+.\Release\ScannerSettings.sbr
+.\Release\ScrollEdit.sbr
+.\Release\UGCBType.sbr
+.\Release\UGCell.sbr
+.\Release\UGCelTyp.sbr
+.\Release\UGCnrBtn.sbr
+.\Release\UGCTarrw.sbr
+.\Release\UGCTPicture.sbr
+.\Release\UGCtrl.sbr
+.\Release\UGDLType.sbr
+.\Release\UGDrgDrp.sbr
+.\Release\UGDrwHnt.sbr
+.\Release\UGDtaSrc.sbr
+.\Release\UGEdit.sbr
+.\Release\ugexcel.sbr
+.\Release\ugformat.sbr
+.\Release\uggdinfo.sbr
+.\Release\UGGrid.sbr
+.\Release\UGHint.sbr
+.\Release\ughscrol.sbr
+.\Release\ugLstBox.sbr
+.\Release\UGMemMan.sbr
+.\Release\UGMultiS.sbr
+.\Release\ugprint.sbr
+.\Release\ugptrlst.sbr
+.\Release\ugsidehd.sbr
+.\Release\ugtab.sbr
+.\Release\UGTopHdg.sbr
+.\Release\ugvscrol.sbr]
+Creating command line "bscmake.exe @C:\DOCUME~1\JNIENH~1\LOCALS~1\Temp\RSP23C.tmp"
+Creating browse info file...
+<h3>Output Window</h3>
+
+
+
+<h3>Results</h3>
+PSIF235.exe - 0 error(s), 0 warning(s)
+<h3>
+--------------------Configuration: PSIF235 - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+
+
+
+<h3>Results</h3>
+PSIF235.exe - 0 error(s), 0 warning(s)
+<h3>
+--------------------Configuration: TLAClientDemo - Win32 DebugU--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x409 /fo"DebugU/TLAClientDemo.res" /d "_DEBUG" /d "_AFXDLL" "C:\Data\ATL_COM\tlaclientdemo\TLAClientDemo.rc"" 
+Creating temporary file "C:\DOCUME~1\JNIENH~1\LOCALS~1\Temp\RSP23D.tmp" with contents
+[
+/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_UNICODE" /FR"DebugU/" /Fp"DebugU/TLAClientDemo.pch" /Yu"stdafx.h" /Fo"DebugU/" /Fd"DebugU/" /FD /GZ /c 
+"C:\Data\ATL_COM\tlaclientdemo\AdvanceMotor.cpp"
+"C:\Data\ATL_COM\tlaclientdemo\AidInterface.cpp"
+"C:\Data\ATL_COM\tlaclientdemo\ClientBuffers.cpp"
+"C:\Data\ATL_COM\tlaclientdemo\colordlg.cpp"
+"C:\Data\ATL_COM\tlaclientdemo\deleterolldlg.cpp"
+"C:\Data\ATL_COM\tlaclientdemo\framedlg.cpp"
+"C:\Data\ATL_COM\tlaclientdemo\globals.cpp"
+"C:\Data\ATL_COM\tlaclientdemo\prescanframingadjust.cpp"
+"C:\Data\ATL_COM\tlaclientdemo\savedlg.cpp"
+"C:\Data\ATL_COM\tlaclientdemo\scandlg.cpp"
+"C:\Data\ATL_COM\tlaclientdemo\TLAClientDemo.cpp"
+"C:\Data\ATL_COM\tlaclientdemo\TLAClientDemoDlg.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\JNIENH~1\LOCALS~1\Temp\RSP23D.tmp" 
+Creating temporary file "C:\DOCUME~1\JNIENH~1\LOCALS~1\Temp\RSP23E.tmp" with contents
+[
+/nologo /MDd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_UNICODE" /FR"DebugU/" /Fp"DebugU/TLAClientDemo.pch" /Yc"stdafx.h" /Fo"DebugU/" /Fd"DebugU/" /FD /GZ /c 
+"C:\Data\ATL_COM\tlaclientdemo\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\JNIENH~1\LOCALS~1\Temp\RSP23E.tmp" 
+Creating temporary file "C:\DOCUME~1\JNIENH~1\LOCALS~1\Temp\RSP23F.tmp" with contents
+[
+VERSION.LIB ..\TLA\AidToolkit\lib\AIDToolkitD.lib /nologo /entry:"wWinMainCRTStartup" /subsystem:windows /incremental:yes /pdb:"DebugU/TLAClientDemo.pdb" /debug /machine:I386 /out:"DebugU/TLAClientDemo.exe" /pdbtype:sept 
+.\DebugU\AdvanceMotor.obj
+.\DebugU\AidInterface.obj
+.\DebugU\ClientBuffers.obj
+.\DebugU\colordlg.obj
+.\DebugU\deleterolldlg.obj
+.\DebugU\framedlg.obj
+.\DebugU\globals.obj
+.\DebugU\prescanframingadjust.obj
+.\DebugU\savedlg.obj
+.\DebugU\scandlg.obj
+.\DebugU\StdAfx.obj
+.\DebugU\TLAClientDemo.obj
+.\DebugU\TLAClientDemoDlg.obj
+.\DebugU\TLAClientDemo.res
+]
+Creating command line "link.exe @C:\DOCUME~1\JNIENH~1\LOCALS~1\Temp\RSP23F.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+AdvanceMotor.cpp
+AidInterface.cpp
+ClientBuffers.cpp
+colordlg.cpp
+deleterolldlg.cpp
+framedlg.cpp
+globals.cpp
+prescanframingadjust.cpp
+savedlg.cpp
+scandlg.cpp
+TLAClientDemo.cpp
+TLAClientDemoDlg.cpp
+Generating Code...
+Linking...
+
+
+
+<h3>Results</h3>
+TLAClientDemo.exe - 0 error(s), 0 warning(s)
+<h3>
+--------------------Configuration: TLAClientDemo - Win32 ReleaseU--------------------
+</h3>
+<h3>Command Lines</h3>
+
+
+
+<h3>Results</h3>
+TLAClientDemo.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
