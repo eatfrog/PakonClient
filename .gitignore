@@ -1,6 +1,5 @@
-pakontest3/pakontest3.csproj.user
-pakontest3.suo
 bin
 obj
 pakontest3/publish
 /src/*.suo
+src/ConsoleClient/ConsoleClient.csproj.user

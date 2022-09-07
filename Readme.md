@@ -21,3 +21,6 @@ _Possibilites maybe?_
 - If the drivers and COM-server can be installed on a newer machine, it would be possible to run a Pakon on something more modern. Maybe not Windows 11 but even 7 would be an upgrade
 - Remote COM-calls from another machine, have the pakon machine to run headless
 - Streamlined client for getting raw scans, together with [my raw converter](https://github.com/eatfrog/pakonrawconverter) you could reduce the number of clicks a lot to get a good nice 16 bit scans
+
+_Important links_
+[Kai Kaufman](https://ktkaufman03.github.io/blog/2022/09/04/pakon-reverse-engineering/) has made important progress on reverse engineering the pakon driver and have gotten them to work on 64bit Windows.
