@@ -14,7 +14,7 @@ _What we know_
 
 _How far have I come?_
 
-It is possible to initialize TLX and run commands towards the TLX API. It is currently possible to try it out to fetch your model information and serial number. This is just a proof-of-concept to show that it is indeed possible to talk to your Pakon scanner with home built software.
+It is possible to initialize TLX and run commands towards the TLX API. It is currently possible to try it out to fetch your model information and serial number.  A simple console client is included which can now perform a basic scan of a colour negative roll and save the result as JPEG images. This is just a proof-of-concept to show that it is indeed possible to talk to your Pakon scanner with home built software.
 
 _Possibilites maybe?_
 
