@@ -19,6 +19,8 @@ namespace PakonLib
 
         private int m_iTLXCookie = 0;
 
+        private CallBackClient m_csCallBackClient = null;
+
         public ScannerUnsafe Unsafe
         {
             get
@@ -164,7 +166,8 @@ namespace PakonLib
         public void InitializeTLX(InitializationRequest request)
         {
             int iSaveToMemoryTimeout = 200000;
-            m_iTLXCookie = m_csTLX.CBAdvise(new CallBackClient(this));
+            m_csCallBackClient = new CallBackClient(this);
+            m_iTLXCookie = m_csTLX.CBAdvise(m_csCallBackClient);
             if (m_iTLXCookie == 0)
             {
                 throw new ArgumentNullException("No Scanner Detected");
@@ -228,6 +231,7 @@ namespace PakonLib
             {
                 m_csTLX.CBUnadvise(m_iTLXCookie);
                 m_iTLXCookie = 0;
+                m_csCallBackClient = null;
             }
         }
     }

@@ -119,6 +119,7 @@ namespace ConsoleClient
             catch (Exception ex)
             {
                 ERROR_CODES_000 errorCode = (ERROR_CODES_000)1;
+                Console.WriteLine(errorCode.ToString());
                 string error = String.Empty;
                 string errornumbers = String.Empty;
                 WorkerThreadOperation wtoperation = WorkerThreadOperation.TlxError;

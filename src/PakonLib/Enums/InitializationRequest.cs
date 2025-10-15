@@ -18,10 +18,6 @@ namespace PakonLib.Enums
         /// </summary>
         public INITIALIZE_CONTROL_000 NativeValue { get; }
 
-        /// <summary>
-        /// Requests the default initialization routine.
-        /// </summary>
-        public static InitializationRequest Default { get; } = new InitializationRequest(INITIALIZE_CONTROL_000.INITIALIZE_Default);
 
         /// <summary>
         /// Requests initialization for the managed C# client.

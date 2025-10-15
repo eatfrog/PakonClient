@@ -46,6 +46,8 @@
   <ItemGroup>
     <Compile Include="Delegates\AddPictureToSaveGroup.cs" />
     <Compile Include="CallBackClient.cs" />
+    <Compile Include="Enums\InitializationRequest.cs" />
+    <Compile Include="Enums\WorkerThreadOperation.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Delegates\ImageFromClientBuffer.cs" />
     <Compile Include="IntBits.cs" />
@@ -65,10 +67,10 @@
     <Compile Include="ScannerSettingsSave.cs" />
     <Compile Include="ScannerUnsafe.cs" />
     <Compile Include="SiPlanarFileHeader.cs" />
-    <Compile Include="TLXError.cs" />
-    <Compile Include="TLXHardware.cs" />
-    <Compile Include="TLXSaveProgress.cs" />
-    <Compile Include="TLXScanProgress.cs" />
+    <Compile Include="Delegates\TLXError.cs" />
+    <Compile Include="Delegates\TLXHardware.cs" />
+    <Compile Include="Delegates\TLXSaveProgress.cs" />
+    <Compile Include="Delegates\TLXScanProgress.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="TLXLib">
