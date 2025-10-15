@@ -40,6 +40,12 @@ namespace ConsoleClient
                     Console.WriteLine("Hardware event: " + a + " - " + errorCode);
                 };
 
+                scanner.m_evTLXSaveProgress += (a, b) =>
+                {
+                    _wtProgress = (WORKER_THREAD_PROGRESS_000)b;
+                    Console.WriteLine("Save event: " + a + " - " + _wtProgress);
+                };
+
                 Thread.Sleep(1000);
 
                 Console.WriteLine("Init TLX");
@@ -68,6 +74,43 @@ namespace ConsoleClient
                 Console.WriteLine("Get scanner info");
                 scanner.IScan.GetScannerInfo000(ref type, ref serial, ref scannerhw1, ref scannerhw2, ref scannerhw3);
                 Console.WriteLine("{0} {1} {2} {3} {4}", type, serial, scannerhw1, scannerhw2, scannerhw3);
+
+                Console.WriteLine("Start scan");
+                _wtProgress = WORKER_THREAD_PROGRESS_000.WTP_Initialize;
+                scanner.IScan.ScanPictures(
+                    RESOLUTION_000.RESOLUTION_BASE_8,
+                    FILM_COLOR_000.FILM_COLOR_NEGATIVE,
+                    FILM_FORMAT_000.FILM_FORMAT_35MM,
+                    STRIP_MODE_000.STRIP_MODE_FULL_ROLL,
+                    SCAN_CONTROL_000.SCAN_None);
+
+                while (_wtProgress != WORKER_THREAD_PROGRESS_000.WTP_ProgressComplete)
+                {
+                    Thread.Sleep(100);
+                }
+                Console.WriteLine("Scan done");
+
+                Console.WriteLine("Move roll to save group");
+                scanner.ISave.MoveOldestRollToSaveGroup();
+
+                Console.WriteLine("Saving to disk");
+                _wtProgress = WORKER_THREAD_PROGRESS_000.WTP_Initialize;
+                scanner.ISave.SaveToDisk(
+                    INDEX_000.INDEX_All,
+                    SAVE_CONTROL_000.SAV_SizeOriginal,
+                    0,
+                    0,
+                    SCALING_METHOD_000.SCALING_METHOD_BICUBIC,
+                    FILE_FORMAT_000.iFILE_FORMAT_JPG,
+                    90,
+                    300,
+                    24);
+
+                while (_wtProgress != WORKER_THREAD_PROGRESS_000.WTP_ProgressComplete)
+                {
+                    Thread.Sleep(100);
+                }
+                Console.WriteLine("Save done");
 
                 Console.WriteLine("Press key to end");
                 Console.ReadKey();
