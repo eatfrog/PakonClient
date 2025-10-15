@@ -50,7 +50,7 @@ namespace ConsoleClient
                 Thread.Sleep(1000);
 
                 Console.WriteLine("Init TLX");
-                scanner.InitializeTLX(INITIALIZE_CONTROL_000.INITIALIZE_CSharpClient);
+                scanner.InitializeTLX(InitializationRequest.CSharpClient);
                 
                 while (_wtProgress != WORKER_THREAD_PROGRESS_000.WTP_ProgressComplete)
                 {
