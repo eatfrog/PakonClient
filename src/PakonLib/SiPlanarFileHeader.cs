@@ -1,11 +1,11 @@
 ﻿// Pakon.SiPlanarFileHeader
 public struct SiPlanarFileHeader
 {
-    public uint m_uiSize;
+    public uint Size;
 
-    public uint m_uiWidth;
+    public uint Width;
 
-    public uint m_uiHeight;
+    public uint Height;
 
-    public uint m_uiBitCount;
+    public uint BitCount;
 }

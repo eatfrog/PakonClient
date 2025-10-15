@@ -7,111 +7,111 @@ namespace PakonLib
 {
     public class ScannerUnsafe
     {
-        private FILE_FORMAT_SAVE_TO_MEMORY_000 m_eMemoryFormat;
+        private FILE_FORMAT_SAVE_TO_MEMORY_000 memoryFormat;
 
-        private bool m_bUsingBuffer1 = true;
+        private bool usingFirstBuffer = true;
 
-        private int m_nBufferSize;
+        private int bufferSize;
 
-        private IntPtr m_ipClientBuffer1;
+        private IntPtr clientBufferPointer1;
 
-        private unsafe byte* m_pubClientBuffer1 = null;
+        private unsafe byte* clientBuffer1 = null;
 
-        private int m_nClientBuffer1 = 0;
+        private int clientBufferAddress1 = 0;
 
-        private IntPtr m_ipClientBuffer2;
+        private IntPtr clientBufferPointer2;
 
-        private unsafe byte* m_pubClientBuffer2 = null;
+        private unsafe byte* clientBuffer2 = null;
 
-        private int m_nClientBuffer2 = 0;
+        private int clientBufferAddress2 = 0;
 
         public FILE_FORMAT_SAVE_TO_MEMORY_000 MemoryFormat
         {
             get
             {
-                return m_eMemoryFormat;
+                return memoryFormat;
             }
             set
             {
-                m_eMemoryFormat = value;
+                memoryFormat = value;
             }
         }
 
-        public event ImageFromClientBuffer m_evImageFromClientBuffer;
+        public event ImageFromClientBuffer ImageFromClientBufferReceived;
 
-        public unsafe void Allocate(int nBufferByteCount)
+        public unsafe void Allocate(int bufferByteCount)
         {
-            m_bUsingBuffer1 = true;
-            m_nBufferSize = nBufferByteCount;
-            m_ipClientBuffer1 = Marshal.AllocHGlobal(nBufferByteCount);
-            m_pubClientBuffer1 = (byte*)(void*)m_ipClientBuffer1;
-            m_nClientBuffer1 = m_ipClientBuffer1.ToInt32();
-            m_ipClientBuffer2 = Marshal.AllocHGlobal(nBufferByteCount);
-            m_pubClientBuffer2 = (byte*)(void*)m_ipClientBuffer2;
-            m_nClientBuffer2 = m_ipClientBuffer2.ToInt32();
+            usingFirstBuffer = true;
+            bufferSize = bufferByteCount;
+            clientBufferPointer1 = Marshal.AllocHGlobal(bufferByteCount);
+            clientBuffer1 = (byte*)(void*)clientBufferPointer1;
+            clientBufferAddress1 = clientBufferPointer1.ToInt32();
+            clientBufferPointer2 = Marshal.AllocHGlobal(bufferByteCount);
+            clientBuffer2 = (byte*)(void*)clientBufferPointer2;
+            clientBufferAddress2 = clientBufferPointer2.ToInt32();
         }
 
         public unsafe void Deallocate()
         {
-            if (m_pubClientBuffer1 != null)
+            if (clientBuffer1 != null)
             {
-                Marshal.FreeHGlobal(m_ipClientBuffer1);
+                Marshal.FreeHGlobal(clientBufferPointer1);
             }
-            m_pubClientBuffer1 = null;
-            m_nClientBuffer1 = 0;
-            if (m_pubClientBuffer2 != null)
+            clientBuffer1 = null;
+            clientBufferAddress1 = 0;
+            if (clientBuffer2 != null)
             {
-                Marshal.FreeHGlobal(m_ipClientBuffer2);
+                Marshal.FreeHGlobal(clientBufferPointer2);
             }
-            m_pubClientBuffer2 = null;
-            m_nClientBuffer2 = 0;
+            clientBuffer2 = null;
+            clientBufferAddress2 = 0;
         }
 
-        public unsafe void NextBuffer(Scanner csScanner)
+        public unsafe void NextBuffer(Scanner scanner)
         {
-            if (m_pubClientBuffer1 == null)
+            if (clientBuffer1 == null)
             {
                 return;
             }
-            if (m_bUsingBuffer1)
+            if (usingFirstBuffer)
             {
-                byte* ptr = m_pubClientBuffer1;
-                int num = 0;
-                while (num < m_nBufferSize)
+                byte* buffer = clientBuffer1;
+                int index = 0;
+                while (index < bufferSize)
                 {
-                    *ptr = 0;
-                    num++;
-                    ptr++;
+                    *buffer = 0;
+                    index++;
+                    buffer++;
                 }
-                csScanner.ISave.ClientMemoryBufferAdd(m_nClientBuffer1, m_nBufferSize);
+                scanner.ISave.ClientMemoryBufferAdd(clientBufferAddress1, bufferSize);
             }
             else
             {
-                byte* ptr2 = m_pubClientBuffer2;
-                int num2 = 0;
-                while (num2 < m_nBufferSize)
+                byte* buffer = clientBuffer2;
+                int index = 0;
+                while (index < bufferSize)
                 {
-                    *ptr2 = 0;
-                    num2++;
-                    ptr2++;
+                    *buffer = 0;
+                    index++;
+                    buffer++;
                 }
-                csScanner.ISave.ClientMemoryBufferAdd(m_nClientBuffer2, m_nBufferSize);
+                scanner.ISave.ClientMemoryBufferAdd(clientBufferAddress2, bufferSize);
             }
-            m_bUsingBuffer1 = !m_bUsingBuffer1;
+            usingFirstBuffer = !usingFirstBuffer;
         }
 
-        public unsafe void ProcessBuffer(Scanner csScanner)
+        public unsafe void ProcessBuffer(Scanner scanner)
         {
-            if (m_pubClientBuffer1 != null)
+            if (clientBuffer1 != null)
             {
-                byte* ptr = (m_bUsingBuffer1 ? m_pubClientBuffer2 : m_pubClientBuffer1);
-                uint num = 0u;
-                switch (m_eMemoryFormat)
+                byte* buffer = (usingFirstBuffer ? clientBuffer2 : clientBuffer1);
+                uint bytesToCopy = 0u;
+                switch (memoryFormat)
                 {
                     case FILE_FORMAT_SAVE_TO_MEMORY_000.iFILE_FORMAT_SAVE_TO_MEMORY_PLANAR_16:
                         {
-                            SiPlanarFileHeader* ptr2 = (SiPlanarFileHeader*)ptr;
-                            num = ptr2->m_uiWidth * ptr2->m_uiHeight * (ptr2->m_uiBitCount / 8u) + (uint)sizeof(SiPlanarFileHeader);
+                            SiPlanarFileHeader* header = (SiPlanarFileHeader*)buffer;
+                            bytesToCopy = header->Width * header->Height * (header->BitCount / 8u) + (uint)sizeof(SiPlanarFileHeader);
                             break;
                         }
                     default:
@@ -120,22 +120,22 @@ namespace PakonLib
                     case FILE_FORMAT_SAVE_TO_MEMORY_000.iFILE_FORMAT_SAVE_TO_MEMORY_DIB_8:
                         break;
                 }
-                if (num == 0)
+                if (bytesToCopy == 0)
                 {
                     throw new ArgumentException("Format not implemented");
                 }
-                byte[] array = new byte[num];
-                byte* ptr3 = ptr;
-                uint num2 = 0u;
-                while (num2 < num)
+                byte[] data = new byte[bytesToCopy];
+                byte* source = buffer;
+                uint index = 0u;
+                while (index < bytesToCopy)
                 {
-                    array[num2] = *ptr3;
-                    num2++;
-                    ptr3++;
+                    data[index] = *source;
+                    index++;
+                    source++;
                 }
-                if (this.m_evImageFromClientBuffer != null)
+                if (ImageFromClientBufferReceived != null)
                 {
-                    this.m_evImageFromClientBuffer(array, num);
+                    ImageFromClientBufferReceived(data, bytesToCopy);
                 }
             }
         }

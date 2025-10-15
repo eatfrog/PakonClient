@@ -9,21 +9,21 @@ namespace PakonLib
 {
     public class Scanner
     {
-        private ScannerScan m_csScannerScan = null;
+        private ScannerScan scannerScan = null;
 
-        private ScannerSave m_csScannerSave = null;
+        private ScannerSave scannerSave = null;
 
-        private ScannerUnsafe m_csUnsafe = new ScannerUnsafe();
+        private ScannerUnsafe scannerUnsafe = new ScannerUnsafe();
 
-        protected TLXMainClass m_csTLX = new TLXMainClass();
+        protected TLXMainClass tlx = new TLXMainClass();
 
-        private int m_iTLXCookie = 0;
+        private int tlxCookie = 0;
 
         public ScannerUnsafe Unsafe
         {
             get
             {
-                return m_csUnsafe;
+                return scannerUnsafe;
             }
         }
 
@@ -31,7 +31,7 @@ namespace PakonLib
         {
             get
             {
-                return m_csScannerScan;
+                return scannerScan;
             }
         }
 
@@ -39,7 +39,7 @@ namespace PakonLib
         {
             get
             {
-                return m_csScannerSave;
+                return scannerSave;
             }
         }
 
@@ -47,26 +47,26 @@ namespace PakonLib
         {
             get
             {
-                return m_csScannerSave;
+                return scannerSave;
             }
         }
 
-        public event TLXError m_evTLXError;
+        public event TLXError TlxError;
 
-        public event TLXHardware m_evTLXHardware;
+        public event TLXHardware TlxHardware;
 
-        public event TLXScanProgress m_evTLXScanProgress;
+        public event TLXScanProgress TlxScanProgress;
 
-        public event TLXSaveProgress m_evTLXSaveProgress;
+        public event TLXSaveProgress TlxSaveProgress;
 
         public Scanner()
         {
-            //m_csUnsafe.Allocate(10000);
-            m_csScannerScan = new ScannerScan(m_csTLX);
-            m_csScannerSave = new ScannerSave(m_csTLX, m_csUnsafe);
+            //scannerUnsafe.Allocate(10000);
+            scannerScan = new ScannerScan(tlx);
+            scannerSave = new ScannerSave(tlx, scannerUnsafe);
         }
 
-        public void TLXAwake(WorkerThreadOperation operation, int lStatus)
+        public void TLXAwake(WorkerThreadOperation operation, int status)
         {
             switch (operation)
             {
@@ -89,18 +89,18 @@ namespace PakonLib
                 case WorkerThreadOperation.ImportFromFileError:
                 case WorkerThreadOperation.SaveError:
                 case WorkerThreadOperation.TlxError:
-                    if (this.m_evTLXError != null)
+                    if (TlxError != null)
                     {
-                        this.m_evTLXError(operation, lStatus);
+                        TlxError(operation, status);
                     }
                     break;
                 case WorkerThreadOperation.HardwareProgress:
                 case WorkerThreadOperation.HardwareError:
                 case WorkerThreadOperation.HardwareApsProgress:
                 case WorkerThreadOperation.HardwareApsError:
-                    if (this.m_evTLXHardware != null)
+                    if (TlxHardware != null)
                     {
-                        this.m_evTLXHardware(operation, lStatus);
+                        TlxHardware(operation, status);
                     }
                     break;
                 case WorkerThreadOperation.InitializeProgress:
@@ -121,13 +121,13 @@ namespace PakonLib
                 case WorkerThreadOperation.ScanProgress:
                 case WorkerThreadOperation.ImportFromFileProgress:
                 case WorkerThreadOperation.TlxProgress:
-                    if (this.m_evTLXScanProgress != null)
+                    if (TlxScanProgress != null)
                     {
-                        this.m_evTLXScanProgress(operation, lStatus);
+                        TlxScanProgress(operation, status);
                     }
                     break;
                 case WorkerThreadOperation.SaveProgress:
-                    switch (lStatus)
+                    switch (status)
                     {
                         case 3000:
                             ISave.ClientMemoryBufferDismissAll();
@@ -141,9 +141,9 @@ namespace PakonLib
                         case 1000:
                             break;
                     }
-                    if (this.m_evTLXSaveProgress != null)
+                    if (TlxSaveProgress != null)
                     {
-                        this.m_evTLXSaveProgress(operation, lStatus);
+                        TlxSaveProgress(operation, status);
                     }
                     break;
             }
@@ -154,7 +154,7 @@ namespace PakonLib
 
         public virtual bool IsClosed()
         {
-            return m_iTLXCookie == 0;
+            return tlxCookie == 0;
         }
 
         public virtual void Closing()
@@ -163,13 +163,13 @@ namespace PakonLib
 
         public void InitializeTLX(InitializationRequest request)
         {
-            int iSaveToMemoryTimeout = 200000;
-            m_iTLXCookie = m_csTLX.CBAdvise(new CallBackClient(this));
-            if (m_iTLXCookie == 0)
+            int saveToMemoryTimeout = 200000;
+            tlxCookie = tlx.CBAdvise(new CallBackClient(this));
+            if (tlxCookie == 0)
             {
                 throw new ArgumentNullException("No Scanner Detected");
             }
-            m_csTLX.InitializeScanner((int)request.NativeValue, iSaveToMemoryTimeout);
+            tlx.InitializeScanner((int)request.NativeValue, saveToMemoryTimeout);
         }
 
         [Obsolete("Use the InitializationRequest overload to avoid referencing TLX enums directly.")]
@@ -178,9 +178,9 @@ namespace PakonLib
             InitializeTLX(InitializationRequest.FromNative(iInitializeControl));
         }
 
-        public void GetAndClearLastErrorTLX(WorkerThreadOperation operation, ref string strError, ref string strErrorNumbers, out int iReturn)
+        public void GetAndClearLastErrorTLX(WorkerThreadOperation operation, ref string strError, ref string strErrorNumbers, out int returnValue)
         {
-            INT_IID_000 iShort_IID = INT_IID_000.INT_IID_ITLAMain;
+            INT_IID_000 shortInterfaceId = INT_IID_000.INT_IID_ITLAMain;
             switch (operation)
             {
                 case WorkerThreadOperation.InitializeError:
@@ -191,7 +191,7 @@ namespace PakonLib
                 case WorkerThreadOperation.FirmwareUpdateMotorError:
                 case WorkerThreadOperation.HardwareError:
                 case WorkerThreadOperation.HardwareApsError:
-                    iShort_IID = INT_IID_000.INT_IID_ITLAMain;
+                    shortInterfaceId = INT_IID_000.INT_IID_ITLAMain;
                     break;
                 case WorkerThreadOperation.FilmTrackTestError:
                 case WorkerThreadOperation.CorrectionsError:
@@ -203,31 +203,31 @@ namespace PakonLib
                 case WorkerThreadOperation.Fx35CManualRetractError:
                 case WorkerThreadOperation.ScanError:
                 case WorkerThreadOperation.ImportFromFileError:
-                    iShort_IID = INT_IID_000.INT_IID_IScanPictures;
+                    shortInterfaceId = INT_IID_000.INT_IID_IScanPictures;
                     break;
                 case WorkerThreadOperation.SaveError:
-                    iShort_IID = INT_IID_000.INT_IID_ISavePictures;
+                    shortInterfaceId = INT_IID_000.INT_IID_ISavePictures;
                     break;
                 case WorkerThreadOperation.TlxError:
-                    iShort_IID = INT_IID_000.INT_IID_ITLXMain;
+                    shortInterfaceId = INT_IID_000.INT_IID_ITLXMain;
                     break;
             }
-            iReturn = m_csTLX.GetAndClearLastError((int)iShort_IID, ref strError, ref strErrorNumbers);
+            returnValue = tlx.GetAndClearLastError((int)shortInterfaceId, ref strError, ref strErrorNumbers);
         }
 
         public void GetInitializeWarnings(ref ScannerInitializeWarnings iwScanner)
         {
-            int piInitializeWarnings = 0;
-            m_csTLX.GetInitializeWarnings(ref piInitializeWarnings);
-            iwScanner = (ScannerInitializeWarnings)piInitializeWarnings;
+            int initializeWarnings = 0;
+            tlx.GetInitializeWarnings(ref initializeWarnings);
+            iwScanner = (ScannerInitializeWarnings)initializeWarnings;
         }
 
         public void CBUnadviseTLX()
         {
-            if (m_iTLXCookie != 0)
+            if (tlxCookie != 0)
             {
-                m_csTLX.CBUnadvise(m_iTLXCookie);
-                m_iTLXCookie = 0;
+                tlx.CBUnadvise(tlxCookie);
+                tlxCookie = 0;
             }
         }
     }
