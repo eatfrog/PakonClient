@@ -12,7 +12,7 @@ public class Global
                 {
                     return (nHeight + 3) * nWidth * 3 + 62;
                 }
-                return (nWidth + 3) * nWidth * 3 + 62;
+                return (nWidth + 3) * nHeight * 3 + 62;
             case FILE_FORMAT_SAVE_TO_MEMORY_000.iFILE_FORMAT_SAVE_TO_MEMORY_PLANAR_16:
                 if (bFourChannel)
                 {
@@ -22,9 +22,9 @@ public class Global
             case FILE_FORMAT_SAVE_TO_MEMORY_000.iFILE_FORMAT_SAVE_TO_MEMORY_PLANAR_8:
                 if (bFourChannel)
                 {
-                    return 4 * nWidth * nHeight * 60;
+                    return 4 * nWidth * nHeight + 60;
                 }
-                return 3 * nWidth * nHeight * 60;
+                return 3 * nWidth * nHeight + 60;
             default:
                 throw new ArgumentException("File format not supported");
         }

@@ -2,6 +2,7 @@
 using System;
 using TLXLib;
 using PakonLib;
+using PakonLib.Enums;
 using PakonLib.Interfaces;
 
 namespace PakonLib 
@@ -65,11 +66,11 @@ namespace PakonLib
             m_csScannerSave = new ScannerSave(m_csTLX, m_csUnsafe);
         }
 
-        public void TLXAwake(WORKER_THREAD_OPERATION_000 lOperation, int lStatus)
+        public void TLXAwake(WORKER_THREAD_OPERATION_000 wtoOperation, int lStatus)
         {
-            WORKER_THREAD_OPERATION_000 wORKER_THREAD_OPERATION_ = WORKER_THREAD_OPERATION_000.WTO_InitializeProgress;
+            WORKER_THREAD_OPERATION_000 wORKER_THREAD_OPERATION_ = wtoOperation;
 
-            switch (lOperation)
+            switch (wtoOperation)
             {
                 case WORKER_THREAD_OPERATION_000.WTO_InitializeError:
                 case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateApsError:
@@ -162,7 +163,7 @@ namespace PakonLib
         {
         }
 
-        public void InitializeTLX(INITIALIZE_CONTROL_000 iInitializeControl)
+        public void InitializeTLX(InitializationRequest request)
         {
             int iSaveToMemoryTimeout = 200000;
             m_iTLXCookie = m_csTLX.CBAdvise(new CallBackClient(this));
@@ -170,7 +171,13 @@ namespace PakonLib
             {
                 throw new ArgumentNullException("No Scanner Detected");
             }
-            m_csTLX.InitializeScanner((int)iInitializeControl, iSaveToMemoryTimeout);
+            m_csTLX.InitializeScanner((int)request.NativeValue, iSaveToMemoryTimeout);
+        }
+
+        [Obsolete("Use the InitializationRequest overload to avoid referencing TLX enums directly.")]
+        public void InitializeTLX(INITIALIZE_CONTROL_000 iInitializeControl)
+        {
+            InitializeTLX(InitializationRequest.FromNative(iInitializeControl));
         }
 
         public void GetAndClearLastErrorTLX(WORKER_THREAD_OPERATION_000 wtoOperation, ref string strError, ref string strErrorNumbers, out int iReturn)
