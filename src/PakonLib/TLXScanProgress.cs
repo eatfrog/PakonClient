@@ -1,4 +1,4 @@
 ﻿// Pakon.TLXScanProgress
-using TLXLib;
+using PakonLib;
 
-public delegate void TLXScanProgress(WORKER_THREAD_OPERATION_000 wtoOperation, int lStatus);
+public delegate void TLXScanProgress(WorkerThreadOperation wtoOperation, int lStatus);

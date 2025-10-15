@@ -64,7 +64,7 @@ namespace ConsoleClient
                 string errorstring = String.Empty;
                 string errornr = string.Empty;
                 int retnr = 0;
-                scanner.GetAndClearLastErrorTLX(WORKER_THREAD_OPERATION_000.WTO_InitializeProgress, ref errorstring, ref errornr, out retnr);
+                scanner.GetAndClearLastErrorTLX(WorkerThreadOperation.InitializeProgress, ref errorstring, ref errornr, out retnr);
                 Console.WriteLine("{0} {1} {2}", errorstring, errornr, retnr);
 
                 var type = SCANNER_TYPE_000.SCANNER_TYPE_UNKNOWN;
@@ -121,7 +121,7 @@ namespace ConsoleClient
                 ERROR_CODES_000 errorCode = (ERROR_CODES_000)1;
                 string error = String.Empty;
                 string errornumbers = String.Empty;
-                WORKER_THREAD_OPERATION_000 wtoperation = WORKER_THREAD_OPERATION_000.WTO_TLXError;
+                WorkerThreadOperation wtoperation = WorkerThreadOperation.TlxError;
 
                 scanner.GetAndClearLastErrorTLX(wtoperation, ref error, ref errornumbers, out int returnint);
                 if (Enum.TryParse<ERROR_CODES_000>(ex.Message, out errorCode))
