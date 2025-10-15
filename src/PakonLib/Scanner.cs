@@ -2,6 +2,7 @@
 using System;
 using TLXLib;
 using PakonLib;
+using System.Runtime.InteropServices;
 using PakonLib.Enums;
 using PakonLib.Interfaces;
 
@@ -20,6 +21,8 @@ namespace PakonLib
         private int tlxCookie = 0;
 
         private CallBackClient m_csCallBackClient = null;
+
+        private GCHandle gch;
 
         public ScannerUnsafe Unsafe
         {
@@ -167,6 +170,7 @@ namespace PakonLib
         {
             int saveToMemoryTimeout = 200000;
             m_csCallBackClient = new CallBackClient(this);
+            gch = GCHandle.Alloc(m_csCallBackClient);
             tlxCookie = tlx.CBAdvise(m_csCallBackClient);
             if (tlxCookie == 0)
             {
@@ -231,6 +235,7 @@ namespace PakonLib
             {
                 tlx.CBUnadvise(tlxCookie);
                 tlxCookie = 0;
+                gch.Free();
                 m_csCallBackClient = null;
             }
         }

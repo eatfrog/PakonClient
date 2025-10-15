@@ -14,12 +14,14 @@ namespace ConsoleClient
     {
         static WORKER_THREAD_PROGRESS_000 _wtProgress = WORKER_THREAD_PROGRESS_000.WTP_Initialize;
 
+        static Scanner scanner;
+
         [STAThread]
         static void Main(string[] args)
         {
             //Console.ReadKey();
             Console.WriteLine("Creating new scanner");
-            var scanner = new Scanner();
+            scanner = new Scanner();
             try
             {
 
