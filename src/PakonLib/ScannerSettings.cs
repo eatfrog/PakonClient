@@ -229,8 +229,8 @@ namespace PakonLib
 
         public void OpenTLX(Scanner csScanner)
         {
-            INITIALIZE_CONTROL_000 iInitializeControl = (INITIALIZE_CONTROL_000)1073741825;
-            csScanner.InitializeTLX(iInitializeControl);
+            var request = InitializationRequest.FromRawValue(1073741825);
+            csScanner.InitializeTLX(request);
         }
 
         public void CloseTLX(Scanner csScanner)
