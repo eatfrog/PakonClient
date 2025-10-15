@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using PakonLib;
 using PakonLib.Enums;
+using System.Security.Principal;
 namespace ConsoleClient
 {
     class Program
@@ -19,6 +20,13 @@ namespace ConsoleClient
         [STAThread]
         static void Main(string[] args)
         {
+            if (!IsAdministrator())
+            {
+                Console.WriteLine("This application requires administrator privileges.");
+                Console.WriteLine("Please restart the application as an administrator.");
+                Console.ReadKey();
+                return;
+            }
             //Console.ReadKey();
             Console.WriteLine("Creating new scanner");
             scanner = new Scanner();
@@ -52,6 +60,7 @@ namespace ConsoleClient
                 Thread.Sleep(1000);
 
                 Console.WriteLine("Init TLX");
+                ClearErrors();
                 scanner.InitializeTLX(InitializationRequest.CSharpClient);
                 
                 while (_wtProgress != WORKER_THREAD_PROGRESS_000.WTP_ProgressComplete)
@@ -120,21 +129,48 @@ namespace ConsoleClient
             }
             catch (Exception ex)
             {
-                ERROR_CODES_000 errorCode = (ERROR_CODES_000)1;
-                Console.WriteLine(errorCode.ToString());
-                string error = String.Empty;
-                string errornumbers = String.Empty;
-                WorkerThreadOperation wtoperation = WorkerThreadOperation.TlxError;
-
-                scanner.GetAndClearLastErrorTLX(wtoperation, ref error, ref errornumbers, out int returnint);
-                if (Enum.TryParse<ERROR_CODES_000>(ex.Message, out errorCode))
-                    Console.WriteLine(error);
-                else
-                    Console.WriteLine(ex.Message + " Error: " + error);
+                ClearErrors(ex);
 
                 Thread.Sleep(3000);
             }
 
+        }
+
+        private static void ClearErrors(Exception ex)
+        {
+            ERROR_CODES_000 errorCode;
+            string error = String.Empty;
+            string errornumbers = String.Empty;
+            int returnint = 0;
+            do
+            {
+                scanner.GetAndClearLastErrorTLX(WorkerThreadOperation.TlxError, ref error, ref errornumbers, out returnint);
+                if (Enum.TryParse<ERROR_CODES_000>(ex.Message, out errorCode))
+                    Console.WriteLine(error);
+                else
+                    Console.WriteLine($"TLX error - exception: {ex.Message} message: {error} num: {errornumbers} int: {returnint}");
+            } while (returnint == 25);
+        }
+
+        private static void ClearErrors()
+        {
+            ERROR_CODES_000 errorCode;
+            string error = String.Empty;
+            string errornumbers = String.Empty;
+            int returnint = 0;
+            do
+            {
+                scanner.GetAndClearLastErrorTLX(WorkerThreadOperation.TlxError, ref error, ref errornumbers, out returnint);
+                errorCode = (ERROR_CODES_000)returnint;
+                Console.WriteLine($"TLX error - message: {error} num: {errornumbers} int: {returnint}");
+            } while (returnint == 25);
+        }
+
+        public static bool IsAdministrator()
+        {
+            WindowsIdentity identity = WindowsIdentity.GetCurrent();
+            WindowsPrincipal principal = new WindowsPrincipal(identity);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
     }
 }
