@@ -1,4 +1,4 @@
 ﻿// Pakon.TLXError
 using PakonLib;
 
-public delegate void TLXError(WorkerThreadOperation wtoOperation, int lStatus);
+public delegate void TLXError(WorkerThreadOperation wtoOperation, int status);

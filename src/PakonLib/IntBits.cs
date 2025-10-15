@@ -3,13 +3,13 @@ using PakonLib;
 
 public class IntBits
 {
-    private int m_nBits = 0;
+    private int bits = 0;
 
     public int Bits
     {
         set
         {
-            m_nBits = value;
+            bits = value;
         }
     }
 
@@ -17,40 +17,40 @@ public class IntBits
     {
         get
         {
-            return (m_nBits & (1 << nIndex)) != 0;
+            return (bits & (1 << nIndex)) != 0;
         }
         set
         {
             if (value)
             {
-                m_nBits |= 1 << nIndex;
+                bits |= 1 << nIndex;
             }
             else
             {
-                m_nBits &= ~(1 << nIndex);
+                bits &= ~(1 << nIndex);
             }
         }
     }
 
     public void Empty()
     {
-        m_nBits = 0;
+        bits = 0;
     }
 
     public bool IsEmpty()
     {
-        return m_nBits == 0;
+        return bits == 0;
     }
 
     public void Equals(IntBits ib)
     {
-        m_nBits = ib.m_nBits;
+        bits = ib.bits;
     }
 
     public IntBits Clone()
     {
         IntBits intBits = new IntBits();
-        intBits.m_nBits = m_nBits;
+        intBits.bits = bits;
         return intBits;
     }
 }

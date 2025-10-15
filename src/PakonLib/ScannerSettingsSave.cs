@@ -6,23 +6,23 @@ namespace PakonLib
 {
     public class ScannerSettingsSave
     {
-        private INDEX_000 m_eIndex;
+        private INDEX_000 index;
 
-        private SAVE_CONTROL_000 m_eSaveControl;
+        private SAVE_CONTROL_000 saveControl;
 
-        private SCALING_METHOD_000 m_eScalingMethod;
+        private SCALING_METHOD_000 scalingMethod;
 
-        private FILE_FORMAT_SAVE_TO_MEMORY_000 m_eMemoryFormat;
+        private FILE_FORMAT_SAVE_TO_MEMORY_000 memoryFormat;
 
         public INDEX_000 Index
         {
             get
             {
-                return m_eIndex;
+                return index;
             }
             set
             {
-                m_eIndex = value;
+                index = value;
             }
         }
 
@@ -30,11 +30,11 @@ namespace PakonLib
         {
             get
             {
-                return m_eSaveControl;
+                return saveControl;
             }
             set
             {
-                m_eSaveControl = value;
+                saveControl = value;
             }
         }
 
@@ -42,11 +42,11 @@ namespace PakonLib
         {
             get
             {
-                return m_eScalingMethod;
+                return scalingMethod;
             }
             set
             {
-                m_eScalingMethod = value;
+                scalingMethod = value;
             }
         }
 
@@ -54,165 +54,165 @@ namespace PakonLib
         {
             get
             {
-                return m_eMemoryFormat;
+                return memoryFormat;
             }
             set
             {
-                m_eMemoryFormat = value;
+                memoryFormat = value;
             }
         }
 
-        public event AddPictureToSaveGroup m_evAddPictureToSaveGroup;
+        public event AddPictureToSaveGroup PictureAddedToSaveGroup;
 
-        public void MoveRollToSaveGroup(Scanner csScanner)
+        public void MoveRollToSaveGroup(Scanner scanner)
         {
-            int iRollCount = 0;
-            int iPictureCount = 0;
-            int iPictureCount2 = 0;
-            csScanner.ISave.GetPictureCountSaveGroup(ref iRollCount, ref iRollCount, ref iPictureCount, ref iRollCount, ref iRollCount);
-            if (iPictureCount > 0)
+            int rollCount = 0;
+            int pictureCount = 0;
+            int picturesToAdd = 0;
+            scanner.ISave.GetPictureCountSaveGroup(ref rollCount, ref rollCount, ref pictureCount, ref rollCount, ref rollCount);
+            if (pictureCount > 0)
             {
-                csScanner.ISave.PutPictureSelection(INDEX_000.INDEX_All, S_OR_H_000.S_OR_H_NONE, true);
+                scanner.ISave.PutPictureSelection(INDEX_000.INDEX_All, S_OR_H_000.S_OR_H_NONE, true);
             }
-            csScanner.ISave.GetPictureCountScanGroup(0, ref iRollCount, ref iPictureCount2, ref iRollCount);
-            csScanner.ISave.MoveOldestRollToSaveGroup();
-            for (int i = iPictureCount; i < iPictureCount + iPictureCount2; i++)
+            scanner.ISave.GetPictureCountScanGroup(0, ref rollCount, ref picturesToAdd, ref rollCount);
+            scanner.ISave.MoveOldestRollToSaveGroup();
+            for (int i = pictureCount; i < pictureCount + picturesToAdd; i++)
             {
-                this.m_evAddPictureToSaveGroup(i);
+                PictureAddedToSaveGroup?.Invoke(i);
             }
         }
 
-        public void SetPictureInfo(Scanner csScanner, int iIndex, int iNewFrameNumber, string strNewFileName, string strNewDirectory, int iNewRotation, S_OR_H_000 eNewSelectedHidden, IntBits ibInfo)
+        public void SetPictureInfo(Scanner scanner, int indexValue, int newFrameNumber, string newFileName, string newDirectory, int newRotation, S_OR_H_000 newSelectedHidden, IntBits info)
         {
-            int iRollIndexFromStrip;
-            int iStripIndexFromStrip;
-            int iFilmProductFromStrip;
-            int iFilmSpecifierFromStrip;
-            string strFrameName;
-            int iFrameNumber;
-            int iPrintAspectRatio;
-            string strFileName;
-            string strDirectory;
-            int iRotation;
-            S_OR_H_000 eiSelectedHidden;
-            csScanner.ISave3.GetPictureInfo3(iIndex, out iRollIndexFromStrip, out iStripIndexFromStrip, out iFilmProductFromStrip, out iFilmSpecifierFromStrip, out strFrameName, out iFrameNumber, out iPrintAspectRatio, out strFileName, out strDirectory, out iRotation, out eiSelectedHidden);
-            if (ibInfo[0])
+            int rollIndexFromStrip;
+            int stripIndexFromStrip;
+            int filmProductFromStrip;
+            int filmSpecifierFromStrip;
+            string frameName;
+            int frameNumber;
+            int printAspectRatio;
+            string fileName;
+            string directory;
+            int rotation;
+            S_OR_H_000 selectedHidden;
+            scanner.ISave3.GetPictureInfo3(indexValue, out rollIndexFromStrip, out stripIndexFromStrip, out filmProductFromStrip, out filmSpecifierFromStrip, out frameName, out frameNumber, out printAspectRatio, out fileName, out directory, out rotation, out selectedHidden);
+            if (info[0])
             {
-                iFrameNumber = iNewFrameNumber;
+                frameNumber = newFrameNumber;
             }
-            if (ibInfo[1])
+            if (info[1])
             {
-                strFileName = strNewFileName;
+                fileName = newFileName;
             }
-            if (ibInfo[2])
+            if (info[2])
             {
-                strDirectory = strNewDirectory;
+                directory = newDirectory;
             }
-            if (ibInfo[3])
+            if (info[3])
             {
-                iRotation = iNewRotation;
+                rotation = newRotation;
             }
-            if (ibInfo[4])
+            if (info[4])
             {
-                eiSelectedHidden = eNewSelectedHidden;
+                selectedHidden = newSelectedHidden;
             }
-            csScanner.ISave.PutPictureInfo(iIndex, iFrameNumber, strFileName, strDirectory, iRotation, eiSelectedHidden);
+            scanner.ISave.PutPictureInfo(indexValue, frameNumber, fileName, directory, rotation, selectedHidden);
         }
 
-        private void FindBoundingRectangle(Scanner csScanner, out int iBoundingWidth, out int iBoundingHeight, out int iBufferByteCount, bool bFourChannel)
+        private void FindBoundingRectangle(Scanner scanner, out int boundingWidth, out int boundingHeight, out int bufferByteCount, bool fourChannel)
         {
-            int iRollCount = 0;
-            int iPictureCount = 0;
-            csScanner.ISave.GetPictureCountSaveGroup(ref iRollCount, ref iRollCount, ref iPictureCount, ref iRollCount, ref iRollCount);
-            int i;
-            int num;
-            switch (m_eIndex)
+            int rollCount = 0;
+            int pictureCount = 0;
+            scanner.ISave.GetPictureCountSaveGroup(ref rollCount, ref rollCount, ref pictureCount, ref rollCount, ref rollCount);
+            int startIndex;
+            int endIndex;
+            switch (index)
             {
                 case INDEX_000.INDEX_All:
                 case INDEX_000.INDEX_AllSelected:
-                    i = 0;
-                    num = iPictureCount;
+                    startIndex = 0;
+                    endIndex = pictureCount;
                     break;
                 case INDEX_000.INDEX_Current:
                 case INDEX_000.INDEX_First:
-                    i = (int)m_eIndex;
-                    num = i + 1;
+                    startIndex = (int)index;
+                    endIndex = startIndex + 1;
                     break;
                 case INDEX_000.INDEX_InsertPictureAtEnd:
                     throw new ArgumentException("Index not supported");
                 default:
-                    if (iPictureCount >= (int)m_eIndex)
+                    if (pictureCount >= (int)index)
                     {
                         throw new ArgumentException("Index out of range");
                     }
-                    i = (int)m_eIndex;
-                    num = i + 1;
+                    startIndex = (int)index;
+                    endIndex = startIndex + 1;
                     break;
             }
-            iBoundingWidth = 0;
-            iBoundingHeight = 0;
-            iBufferByteCount = 0;
-            for (; i < num; i++)
+            boundingWidth = 0;
+            boundingHeight = 0;
+            bufferByteCount = 0;
+            for (int currentIndex = startIndex; currentIndex < endIndex; currentIndex++)
             {
                 bool flag = true;
-                if (m_eIndex == INDEX_000.INDEX_AllSelected)
+                if (index == INDEX_000.INDEX_AllSelected)
                 {
-                    S_OR_H_000 eiSelectedHidden = S_OR_H_000.S_OR_H_NONE;
-                    PakonLib.Interfaces.ISavePictures3 iSave = csScanner.ISave3;
-                    int iIndex = i;
-                    string strFrameName = null;
-                    string strFileName = null;
-                    string strDirectory = null;
-                    iSave.GetPictureInfo3(iIndex, out iRollCount, out iRollCount, out iRollCount, out iRollCount, out strFrameName, out iRollCount, out iRollCount, out strFileName, out strDirectory, out iRollCount, out eiSelectedHidden);
-                    flag = eiSelectedHidden == S_OR_H_000.S_OR_H_SELECTED;
+                    S_OR_H_000 selectedHidden = S_OR_H_000.S_OR_H_NONE;
+                    PakonLib.Interfaces.ISavePictures3 saveInterface = scanner.ISave3;
+                    int pictureIndex = currentIndex;
+                    string frameName = null;
+                    string fileName = null;
+                    string directory = null;
+                    saveInterface.GetPictureInfo3(pictureIndex, out rollCount, out rollCount, out rollCount, out rollCount, out frameName, out rollCount, out rollCount, out fileName, out directory, out rollCount, out selectedHidden);
+                    flag = selectedHidden == S_OR_H_000.S_OR_H_SELECTED;
                 }
                 if (flag)
                 {
-                    int iLeftLR = 0;
-                    int iTopLR = 0;
-                    int iRightLR = 0;
-                    int iBottomLR = 0;
-                    if ((m_eSaveControl & SAVE_CONTROL_000.SAV_UseLoResBuffer) == SAVE_CONTROL_000.SAV_UseLoResBuffer)
+                    int left = 0;
+                    int top = 0;
+                    int right = 0;
+                    int bottom = 0;
+                    if ((saveControl & SAVE_CONTROL_000.SAV_UseLoResBuffer) == SAVE_CONTROL_000.SAV_UseLoResBuffer)
                     {
-                        csScanner.ISave.GetPictureFramingUserInfoLowRes(i, ref iLeftLR, ref iTopLR, ref iRightLR, ref iBottomLR);
+                        scanner.ISave.GetPictureFramingUserInfoLowRes(currentIndex, ref left, ref top, ref right, ref bottom);
                     }
                     else
                     {
-                        csScanner.ISave.GetPictureFramingUserInfo(i, ref iLeftLR, ref iTopLR, ref iRightLR, ref iBottomLR);
+                        scanner.ISave.GetPictureFramingUserInfo(currentIndex, ref left, ref top, ref right, ref bottom);
                     }
-                    int num2 = iRightLR + 1 - iLeftLR;
-                    int num3 = iBottomLR + 1 - iTopLR;
-                    int num4 = Global.BufferSize(num2, num3, m_eMemoryFormat, bFourChannel);
-                    if (iBoundingWidth < num2)
+                    int width = right + 1 - left;
+                    int height = bottom + 1 - top;
+                    int bufferSize = Global.BufferSize(width, height, memoryFormat, fourChannel);
+                    if (boundingWidth < width)
                     {
-                        iBoundingWidth = num2;
+                        boundingWidth = width;
                     }
-                    if (iBoundingHeight < num3)
+                    if (boundingHeight < height)
                     {
-                        iBoundingHeight = num3;
+                        boundingHeight = height;
                     }
-                    if (iBufferByteCount < num4)
+                    if (bufferByteCount < bufferSize)
                     {
-                        iBufferByteCount = num4;
+                        bufferByteCount = bufferSize;
                     }
                 }
             }
         }
 
-        public void SaveToClientMemory(Scanner csScanner, ScannerSettings csScannerSettings, bool bFourChannel)
+        public void SaveToClientMemory(Scanner scanner, ScannerSettings scannerSettings, bool fourChannel)
         {
-            int iBoundingWidth;
-            int iBoundingHeight;
-            int iBufferByteCount;
-            FindBoundingRectangle(csScanner, out iBoundingWidth, out iBoundingHeight, out iBufferByteCount, bFourChannel);
-            if (iBufferByteCount == 0)
+            int boundingWidth;
+            int boundingHeight;
+            int bufferByteCount;
+            FindBoundingRectangle(scanner, out boundingWidth, out boundingHeight, out bufferByteCount, fourChannel);
+            if (bufferByteCount == 0)
             {
                 throw new ArgumentException("No pictures to save");
             }
-            csScanner.Unsafe.MemoryFormat = MemoryFormat;
-            csScanner.Unsafe.Allocate(iBufferByteCount);
-            csScanner.Unsafe.NextBuffer(csScanner);
-            csScanner.ISave.SaveToClientMemory(csScannerSettings.Type, m_eIndex, m_eSaveControl, iBoundingWidth, iBoundingHeight, m_eScalingMethod, m_eMemoryFormat, bFourChannel);
+            scanner.Unsafe.MemoryFormat = MemoryFormat;
+            scanner.Unsafe.Allocate(bufferByteCount);
+            scanner.Unsafe.NextBuffer(scanner);
+            scanner.ISave.SaveToClientMemory(scannerSettings.Type, index, saveControl, boundingWidth, boundingHeight, scalingMethod, memoryFormat, fourChannel);
         }
     }
 

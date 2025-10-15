@@ -6,75 +6,75 @@ namespace PakonLib
 {
     public class ScannerScan : PakonLib.Interfaces.IScanPictures
     {
-        private TLXMainClass m_csTLX = null;
+        private TLXMainClass tlx = null;
 
-        public ScannerScan(TLXMainClass csTLX)
+        public ScannerScan(TLXMainClass tlxMain)
         {
-            m_csTLX = csTLX;
+            tlx = tlxMain;
         }
 
-        public void FocusCorrection(RESOLUTION_000 iResolution, FILM_COLOR_000 iFilmColor, FILM_FORMAT_000 iFilmFormat, bool bAdvanceFilm)
+        public void FocusCorrection(RESOLUTION_000 resolution, FILM_COLOR_000 filmColor, FILM_FORMAT_000 filmFormat, bool advanceFilm)
         {
-            CALIBRATE_CONTROL_000 iCalibrateControl = (bAdvanceFilm ? CALIBRATE_CONTROL_000.CALIBRATE_FocusAdvanceFilm : CALIBRATE_CONTROL_000.CALIBRATE_Focus);
-            m_csTLX.ForceCorrections((int)iResolution, (int)iFilmColor, (int)iFilmFormat, (int)iCalibrateControl);
+            CALIBRATE_CONTROL_000 calibrateControl = (advanceFilm ? CALIBRATE_CONTROL_000.CALIBRATE_FocusAdvanceFilm : CALIBRATE_CONTROL_000.CALIBRATE_Focus);
+            tlx.ForceCorrections((int)resolution, (int)filmColor, (int)filmFormat, (int)calibrateControl);
         }
 
-        public void LightCorrection(RESOLUTION_000 iResolution, FILM_COLOR_000 iFilmColor, FILM_FORMAT_000 iFilmFormat, bool bIR)
+        public void LightCorrection(RESOLUTION_000 resolution, FILM_COLOR_000 filmColor, FILM_FORMAT_000 filmFormat, bool includeIr)
         {
-            CALIBRATE_CONTROL_000 cALIBRATE_CONTROL_ = CALIBRATE_CONTROL_000.CALIBRATE_Light;
-            if (bIR)
+            CALIBRATE_CONTROL_000 calibrateControl = CALIBRATE_CONTROL_000.CALIBRATE_Light;
+            if (includeIr)
             {
-                cALIBRATE_CONTROL_ |= CALIBRATE_CONTROL_000.CALIBRATE_UseScratchRemoval;
+                calibrateControl |= CALIBRATE_CONTROL_000.CALIBRATE_UseScratchRemoval;
             }
-            m_csTLX.ForceCorrections((int)iResolution, (int)iFilmColor, (int)iFilmFormat, (int)cALIBRATE_CONTROL_);
+            tlx.ForceCorrections((int)resolution, (int)filmColor, (int)filmFormat, (int)calibrateControl);
         }
 
-        public void FilmTrackTest(bool bAdjustPots)
+        public void FilmTrackTest(bool adjustPots)
         {
-            int bDxPotsAdjust = (bAdjustPots ? 1 : 0);
-            m_csTLX.FilmTrackTest(bDxPotsAdjust, 1);
+            int adjustPotsValue = (adjustPots ? 1 : 0);
+            tlx.FilmTrackTest(adjustPotsValue, 1);
         }
 
         public int FilmTrackTestResults()
         {
-            return m_csTLX.FilmTrackTestResults();
+            return tlx.FilmTrackTestResults();
         }
 
-        public void ScanPictures(RESOLUTION_000 rResolution, FILM_COLOR_000 fFilmColor, FILM_FORMAT_000 fFilmFormat, STRIP_MODE_000 smStripMode, SCAN_CONTROL_000 scControl)
+        public void ScanPictures(RESOLUTION_000 resolution, FILM_COLOR_000 filmColor, FILM_FORMAT_000 filmFormat, STRIP_MODE_000 stripMode, SCAN_CONTROL_000 scanControl)
         {
-            string bstrRollId = "1000";
-            m_csTLX.ScanPictures((int)rResolution, (int)fFilmColor, (int)fFilmFormat, (int)smStripMode, (int)scControl, bstrRollId);
+            string rollId = "1000";
+            tlx.ScanPictures((int)resolution, (int)filmColor, (int)filmFormat, (int)stripMode, (int)scanControl, rollId);
         }
 
         public void ScanCancel()
         {
-            m_csTLX.ScanCancel();
+            tlx.ScanCancel();
         }
 
-        public void AdvanceFilm(int iAdvanceMilliseconds, int iAdvanceSpeed)
+        public void AdvanceFilm(int advanceMilliseconds, int advanceSpeed)
         {
-            m_csTLX.AdvanceFilm(iAdvanceMilliseconds, iAdvanceSpeed);
+            tlx.AdvanceFilm(advanceMilliseconds, advanceSpeed);
         }
 
-        public void GetScannerInfo000(ref SCANNER_TYPE_000 iScannerType, 
-            ref int iScannerSerialNumber, 
-            ref ScannerHW135 iHw135, 
-            ref ScannerHW235 iHw235, 
-            ref ScannerHW335 iHw335)
+        public void GetScannerInfo000(ref SCANNER_TYPE_000 scannerType,
+            ref int scannerSerialNumber,
+            ref ScannerHW135 hardware135,
+            ref ScannerHW235 hardware235,
+            ref ScannerHW335 hardware335)
         {
-            int piScannerType = 0;
-            int piScannerVersionHw = 0;
-            int piDarkPointCorrectIntervalMinutes = 0;
-            int piColorPortraitMode = 0;
-            int pi_uiScanPacketReadyTimeOut = 0;
-            int pi_uiNoFilmTimeOut = 0;
-            int piLampSaverSec = 0;
-            string pbstrRomVersion = "";
-            string pbstrScannerModel = "";
-            string pbstrTLAVersion = "";
-            string pbstrTLXVersion = "";        
-            m_csTLX.GetScannerInfo000(ref piScannerType, ref pbstrRomVersion, ref pbstrScannerModel, ref iScannerSerialNumber, ref piScannerVersionHw, ref pbstrTLAVersion, ref piDarkPointCorrectIntervalMinutes, ref piColorPortraitMode, ref pi_uiScanPacketReadyTimeOut, ref pi_uiNoFilmTimeOut, ref piLampSaverSec, ref pbstrTLXVersion);
-            Global.Convert(piScannerType, piScannerVersionHw, out iScannerType, out iHw135, out iHw235, out iHw335);
+            int nativeScannerType = 0;
+            int nativeScannerVersionHardware = 0;
+            int darkPointCorrectIntervalMinutes = 0;
+            int colorPortraitMode = 0;
+            int scanPacketReadyTimeout = 0;
+            int noFilmTimeout = 0;
+            int lampSaverSeconds = 0;
+            string romVersion = "";
+            string scannerModel = "";
+            string tlaVersion = "";
+            string tlxVersion = "";
+            tlx.GetScannerInfo000(ref nativeScannerType, ref romVersion, ref scannerModel, ref scannerSerialNumber, ref nativeScannerVersionHardware, ref tlaVersion, ref darkPointCorrectIntervalMinutes, ref colorPortraitMode, ref scanPacketReadyTimeout, ref noFilmTimeout, ref lampSaverSeconds, ref tlxVersion);
+            Global.Convert(nativeScannerType, nativeScannerVersionHardware, out scannerType, out hardware135, out hardware235, out hardware335);
         }
     }
 
