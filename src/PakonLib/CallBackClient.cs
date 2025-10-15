@@ -1,24 +1,31 @@
-﻿// Pakon.CallBackClient
+// Pakon.CallBackClient
+using System;
 using System.Threading;
 using PakonLib;
 using TLXLib;
+using System.Runtime.InteropServices;
 
-public class CallBackClient : ICallBackClient
+namespace PakonLib
 {
-    private Scanner scanner;
-
-    public CallBackClient(Scanner scannerInstance)
+    [ComVisible(true)]
+    [ClassInterface(ClassInterfaceType.None)]
+    public class CallBackClient : StandardOleMarshalObject, ICallBackClient
     {
-        scanner = scannerInstance;
-    }
+        private Scanner scanner;
 
-    public void Awake(int operationValue, int status)
-    {
-        if (status == 3000)
+        public CallBackClient(Scanner scannerInstance)
         {
-            Thread.Sleep(300);
+            scanner = scannerInstance;
         }
-        WorkerThreadOperation operation = (WorkerThreadOperation)operationValue;
-        scanner.TLXAwake(operation, status);
+
+        public void Awake(int operationValue, int status)
+        {
+            if (status == 3000)
+            {
+                Thread.Sleep(300);
+            }
+            WorkerThreadOperation operation = (WorkerThreadOperation)operationValue;
+            scanner.TLXAwake(operation, status);
+        }
     }
 }
