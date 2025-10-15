@@ -19,6 +19,8 @@ namespace PakonLib
 
         private int tlxCookie = 0;
 
+        private CallBackClient m_csCallBackClient = null;
+
         public ScannerUnsafe Unsafe
         {
             get
@@ -164,7 +166,8 @@ namespace PakonLib
         public void InitializeTLX(InitializationRequest request)
         {
             int saveToMemoryTimeout = 200000;
-            tlxCookie = tlx.CBAdvise(new CallBackClient(this));
+            m_csCallBackClient = new CallBackClient(this);
+            tlxCookie = tlx.CBAdvise(m_csCallBackClient);
             if (tlxCookie == 0)
             {
                 throw new ArgumentNullException("No Scanner Detected");
@@ -228,6 +231,7 @@ namespace PakonLib
             {
                 tlx.CBUnadvise(tlxCookie);
                 tlxCookie = 0;
+                m_csCallBackClient = null;
             }
         }
     }
