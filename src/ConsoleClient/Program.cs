@@ -23,25 +23,25 @@ namespace ConsoleClient
             try
             {
 
-                scanner.m_evTLXScanProgress += (a, b) =>
+                scanner.TlxScanProgress += (a, b) =>
                 {
                     _wtProgress = (WORKER_THREAD_PROGRESS_000)b;
                     Console.WriteLine("Scan event: " + a + " - " + _wtProgress);
                 };
-                scanner.m_evTLXError += (a, c) =>
+                scanner.TlxError += (a, c) =>
                 {
                     var errorCode = (ERROR_CODES_000)c;
                     Console.WriteLine("Error event: " + a + " - " + errorCode);
                     throw new Exception(a + "- " + errorCode);
                 };
 
-                scanner.m_evTLXHardware += (a, c) =>
+                scanner.TlxHardware += (a, c) =>
                 {
                     var errorCode = (ERROR_CODES_000)c;
                     Console.WriteLine("Hardware event: " + a + " - " + errorCode);
                 };
 
-                scanner.m_evTLXSaveProgress += (a, b) =>
+                scanner.TlxSaveProgress += (a, b) =>
                 {
                     _wtProgress = (WORKER_THREAD_PROGRESS_000)b;
                     Console.WriteLine("Save event: " + a + " - " + _wtProgress);

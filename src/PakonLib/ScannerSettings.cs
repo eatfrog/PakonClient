@@ -7,27 +7,27 @@ namespace PakonLib
 {
     public class ScannerSettings
     {
-        private ScannerSettingsSave m_csScannerSettingsSave = null;
+        private ScannerSettingsSave scannerSettingsSave = null;
 
-        protected ScannerInitializeWarnings m_iwScanner = ScannerInitializeWarnings.Unknown;
+        protected ScannerInitializeWarnings initializeWarnings = ScannerInitializeWarnings.Unknown;
 
-        protected SCANNER_TYPE_000 m_stType = SCANNER_TYPE_000.SCANNER_TYPE_UNKNOWN;
+        protected SCANNER_TYPE_000 scannerType = SCANNER_TYPE_000.SCANNER_TYPE_UNKNOWN;
 
-        protected int m_nSerialNumber = 0;
+        protected int serialNumber = 0;
 
-        protected ScannerHW135 m_sh135 = ScannerHW135.Unknown;
+        protected ScannerHW135 hardware135 = ScannerHW135.Unknown;
 
-        protected ScannerHW235 m_sh235 = ScannerHW235.Unknown;
+        protected ScannerHW235 hardware235 = ScannerHW235.Unknown;
 
-        protected ScannerHW335 m_sh335 = ScannerHW335.Unknown;
+        protected ScannerHW335 hardware335 = ScannerHW335.Unknown;
 
-        private IntBits m_capabilities = null;
+        private IntBits capabilities = null;
 
         public ScannerInitializeWarnings InitializeWarnings
         {
             get
             {
-                return m_iwScanner;
+                return initializeWarnings;
             }
         }
 
@@ -35,7 +35,7 @@ namespace PakonLib
         {
             get
             {
-                return m_stType;
+                return scannerType;
             }
         }
 
@@ -43,7 +43,7 @@ namespace PakonLib
         {
             get
             {
-                return m_nSerialNumber;
+                return serialNumber;
             }
         }
 
@@ -51,7 +51,7 @@ namespace PakonLib
         {
             get
             {
-                return m_sh135;
+                return hardware135;
             }
         }
 
@@ -59,7 +59,7 @@ namespace PakonLib
         {
             get
             {
-                return m_sh235;
+                return hardware235;
             }
         }
 
@@ -67,7 +67,7 @@ namespace PakonLib
         {
             get
             {
-                return m_sh335;
+                return hardware335;
             }
         }
 
@@ -75,11 +75,11 @@ namespace PakonLib
         {
             get
             {
-                if (m_capabilities == null)
+                if (capabilities == null)
                 {
                     return false;
                 }
-                return m_capabilities[(int)iCapability];
+                return capabilities[(int)iCapability];
             }
         }
 
@@ -87,210 +87,210 @@ namespace PakonLib
         {
             get
             {
-                return m_csScannerSettingsSave;
+                return scannerSettingsSave;
             }
         }
 
         public ScannerSettings()
         {
-            m_csScannerSettingsSave = new ScannerSettingsSave();
+            scannerSettingsSave = new ScannerSettingsSave();
         }
 
         public virtual void Reset()
         {
-            m_iwScanner = ScannerInitializeWarnings.Unknown;
-            m_stType = SCANNER_TYPE_000.SCANNER_TYPE_UNKNOWN;
-            m_nSerialNumber = 0;
-            m_sh135 = ScannerHW135.Unknown;
-            m_sh235 = ScannerHW235.Unknown;
-            m_sh335 = ScannerHW335.Unknown;
-            m_capabilities = null;
+            initializeWarnings = ScannerInitializeWarnings.Unknown;
+            scannerType = SCANNER_TYPE_000.SCANNER_TYPE_UNKNOWN;
+            serialNumber = 0;
+            hardware135 = ScannerHW135.Unknown;
+            hardware235 = ScannerHW235.Unknown;
+            hardware335 = ScannerHW335.Unknown;
+            capabilities = null;
         }
 
         protected void SetCapabilities()
         {
-            m_capabilities = new IntBits();
+            capabilities = new IntBits();
             switch (Type)
             {
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_235:
-                    m_capabilities[26] = true;
-                    m_capabilities[27] = true;
-                    m_capabilities[28] = true;
-                    m_capabilities[22] = true;
-                    m_capabilities[23] = true;
-                    m_capabilities[24] = true;
-                    m_capabilities[29] = true;
-                    m_capabilities[30] = true;
-                    m_capabilities[31] = true;
-                    m_capabilities[0] = true;
-                    m_capabilities[2] = true;
-                    m_capabilities[4] = true;
-                    m_capabilities[3] = true;
-                    m_capabilities[7] = true;
+                    capabilities[26] = true;
+                    capabilities[27] = true;
+                    capabilities[28] = true;
+                    capabilities[22] = true;
+                    capabilities[23] = true;
+                    capabilities[24] = true;
+                    capabilities[29] = true;
+                    capabilities[30] = true;
+                    capabilities[31] = true;
+                    capabilities[0] = true;
+                    capabilities[2] = true;
+                    capabilities[4] = true;
+                    capabilities[3] = true;
+                    capabilities[7] = true;
                     break;
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_235C:
-                    m_capabilities[26] = true;
-                    m_capabilities[27] = true;
-                    m_capabilities[28] = true;
-                    m_capabilities[22] = true;
-                    m_capabilities[23] = true;
-                    m_capabilities[24] = true;
-                    m_capabilities[25] = true;
-                    m_capabilities[29] = true;
-                    m_capabilities[30] = true;
-                    m_capabilities[31] = true;
-                    m_capabilities[0] = true;
-                    m_capabilities[2] = true;
-                    m_capabilities[4] = true;
-                    m_capabilities[3] = true;
-                    m_capabilities[5] = true;
-                    m_capabilities[7] = true;
+                    capabilities[26] = true;
+                    capabilities[27] = true;
+                    capabilities[28] = true;
+                    capabilities[22] = true;
+                    capabilities[23] = true;
+                    capabilities[24] = true;
+                    capabilities[25] = true;
+                    capabilities[29] = true;
+                    capabilities[30] = true;
+                    capabilities[31] = true;
+                    capabilities[0] = true;
+                    capabilities[2] = true;
+                    capabilities[4] = true;
+                    capabilities[3] = true;
+                    capabilities[5] = true;
+                    capabilities[7] = true;
                     break;
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_135:
-                    m_capabilities[29] = true;
-                    m_capabilities[30] = true;
-                    m_capabilities[31] = true;
-                    m_capabilities[6] = true;
+                    capabilities[29] = true;
+                    capabilities[30] = true;
+                    capabilities[31] = true;
+                    capabilities[6] = true;
                     break;
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_135_PLUS:
-                    m_capabilities[29] = true;
-                    m_capabilities[30] = true;
-                    m_capabilities[31] = true;
-                    m_capabilities[6] = true;
+                    capabilities[29] = true;
+                    capabilities[30] = true;
+                    capabilities[31] = true;
+                    capabilities[6] = true;
                     break;
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_335:
-                    m_capabilities[26] = true;
-                    m_capabilities[27] = true;
-                    m_capabilities[28] = true;
-                    m_capabilities[22] = true;
-                    m_capabilities[23] = true;
-                    m_capabilities[24] = true;
-                    m_capabilities[29] = true;
-                    m_capabilities[30] = true;
-                    m_capabilities[31] = true;
-                    m_capabilities[2] = true;
-                    m_capabilities[4] = true;
-                    m_capabilities[3] = true;
+                    capabilities[26] = true;
+                    capabilities[27] = true;
+                    capabilities[28] = true;
+                    capabilities[22] = true;
+                    capabilities[23] = true;
+                    capabilities[24] = true;
+                    capabilities[29] = true;
+                    capabilities[30] = true;
+                    capabilities[31] = true;
+                    capabilities[2] = true;
+                    capabilities[4] = true;
+                    capabilities[3] = true;
                     break;
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_335C:
-                    m_capabilities[26] = true;
-                    m_capabilities[27] = true;
-                    m_capabilities[28] = true;
-                    m_capabilities[22] = true;
-                    m_capabilities[23] = true;
-                    m_capabilities[24] = true;
-                    m_capabilities[25] = true;
-                    m_capabilities[29] = true;
-                    m_capabilities[30] = true;
-                    m_capabilities[31] = true;
-                    m_capabilities[2] = true;
-                    m_capabilities[4] = true;
-                    m_capabilities[3] = true;
+                    capabilities[26] = true;
+                    capabilities[27] = true;
+                    capabilities[28] = true;
+                    capabilities[22] = true;
+                    capabilities[23] = true;
+                    capabilities[24] = true;
+                    capabilities[25] = true;
+                    capabilities[29] = true;
+                    capabilities[30] = true;
+                    capabilities[31] = true;
+                    capabilities[2] = true;
+                    capabilities[4] = true;
+                    capabilities[3] = true;
                     break;
             }
         }
 
-        public void SetScannerType(SCANNER_TYPE_000 stNewType)
+        public void SetScannerType(SCANNER_TYPE_000 newType)
         {
             switch (Type)
             {
                 case SCANNER_TYPE_000.SCANNER_TYPE_UNKNOWN:
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_135:
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_135_PLUS:
-                    if (m_stType != stNewType)
+                    if (scannerType != newType)
                     {
                         throw new ArgumentException("Scanner type change not allowed");
                     }
                     break;
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_235:
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_235C:
-                    if (m_stType != SCANNER_TYPE_000.SCANNER_TYPE_F_235 && m_stType != SCANNER_TYPE_000.SCANNER_TYPE_F_235C)
+                    if (scannerType != SCANNER_TYPE_000.SCANNER_TYPE_F_235 && scannerType != SCANNER_TYPE_000.SCANNER_TYPE_F_235C)
                     {
                         throw new ArgumentException("Scanner type change not allowed");
                     }
                     break;
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_335:
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_335C:
-                    if (m_stType != SCANNER_TYPE_000.SCANNER_TYPE_F_335 && m_stType != SCANNER_TYPE_000.SCANNER_TYPE_F_335C)
+                    if (scannerType != SCANNER_TYPE_000.SCANNER_TYPE_F_335 && scannerType != SCANNER_TYPE_000.SCANNER_TYPE_F_335C)
                     {
                         throw new ArgumentException("Scanner type change not allowed");
                     }
                     break;
             }
-            m_stType = stNewType;
+            scannerType = newType;
         }
 
-        public void CompleteTLXInitialization(Scanner csScanner)
+        public void CompleteTLXInitialization(Scanner scanner)
         {
-            csScanner.GetInitializeWarnings(ref m_iwScanner);
-            csScanner.IScan.GetScannerInfo000(ref m_stType, ref m_nSerialNumber, ref m_sh135, ref m_sh235, ref m_sh335);
+            scanner.GetInitializeWarnings(ref initializeWarnings);
+            scanner.IScan.GetScannerInfo000(ref scannerType, ref serialNumber, ref hardware135, ref hardware235, ref hardware335);
             SetCapabilities();
         }
 
-        public void OpenTLX(Scanner csScanner)
+        public void OpenTLX(Scanner scanner)
         {
             var request = InitializationRequest.FromRawValue(1073741825);
-            csScanner.InitializeTLX(request);
+            scanner.InitializeTLX(request);
         }
 
-        public void CloseTLX(Scanner csScanner)
+        public void CloseTLX(Scanner scanner)
         {
-            csScanner.CBUnadviseTLX();
+            scanner.CBUnadviseTLX();
         }
 
-        public int GetResolutionHeight(Scanner csScanner, RESOLUTION_000 srResolution, FILM_FORMAT_000 ffFormat)
+        public int GetResolutionHeight(Scanner scanner, RESOLUTION_000 resolution, FILM_FORMAT_000 filmFormat)
         {
-            return Global.GetResolutionHeight(Type, srResolution, ffFormat);
+            return Global.GetResolutionHeight(Type, resolution, filmFormat);
         }
 
-        public void Scan(Scanner csScanner)
+        public void Scan(Scanner scanner)
         {
-            FILM_COLOR_000 fFilmColor = FILM_COLOR_000.FILM_COLOR_NEGATIVE;
-            FILM_FORMAT_000 fFilmFormat = FILM_FORMAT_000.FILM_FORMAT_35MM;
-            RESOLUTION_000 rResolution = RESOLUTION_000.RESOLUTION_BASE_4;
-            STRIP_MODE_000 smStripMode = STRIP_MODE_000.STRIP_MODE_FULL_ROLL;
-            SCAN_CONTROL_000 scControl = SCAN_CONTROL_000.SCAN_None;
+            FILM_COLOR_000 filmColor = FILM_COLOR_000.FILM_COLOR_NEGATIVE;
+            FILM_FORMAT_000 filmFormat = FILM_FORMAT_000.FILM_FORMAT_35MM;
+            RESOLUTION_000 resolution = RESOLUTION_000.RESOLUTION_BASE_4;
+            STRIP_MODE_000 stripMode = STRIP_MODE_000.STRIP_MODE_FULL_ROLL;
+            SCAN_CONTROL_000 scanControl = SCAN_CONTROL_000.SCAN_None;
             switch (Type)
             {
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_135:
-                    rResolution = RESOLUTION_000.RESOLUTION_BASE_4;
+                    resolution = RESOLUTION_000.RESOLUTION_BASE_4;
                     break;
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_235:
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_235C:
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_135_PLUS:
-                    rResolution = RESOLUTION_000.RESOLUTION_BASE_8;
+                    resolution = RESOLUTION_000.RESOLUTION_BASE_8;
                     break;
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_335:
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_335C:
-                    rResolution = RESOLUTION_000.RESOLUTION_BASE_8;
+                    resolution = RESOLUTION_000.RESOLUTION_BASE_8;
                     break;
             }
-            csScanner.IScan.ScanPictures(rResolution, fFilmColor, fFilmFormat, smStripMode, scControl);
+            scanner.IScan.ScanPictures(resolution, filmColor, filmFormat, stripMode, scanControl);
         }
 
-        public void EjectFilm(Scanner csScanner)
+        public void EjectFilm(Scanner scanner)
         {
-            int iAdvanceMilliseconds = 0;
-            int iAdvanceSpeed = 0;
+            int advanceMilliseconds = 0;
+            int advanceSpeed = 0;
             switch (Type)
             {
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_135:
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_135_PLUS:
-                    iAdvanceMilliseconds = 500;
-                    iAdvanceSpeed = 1000;
+                    advanceMilliseconds = 500;
+                    advanceSpeed = 1000;
                     break;
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_235:
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_235C:
-                    iAdvanceMilliseconds = 5000;
-                    iAdvanceSpeed = 1000;
+                    advanceMilliseconds = 5000;
+                    advanceSpeed = 1000;
                     break;
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_335:
                 case SCANNER_TYPE_000.SCANNER_TYPE_F_335C:
-                    iAdvanceMilliseconds = 5000;
-                    iAdvanceSpeed = 1000;
+                    advanceMilliseconds = 5000;
+                    advanceSpeed = 1000;
                     break;
             }
-            csScanner.IScan.AdvanceFilm(iAdvanceMilliseconds, iAdvanceSpeed);
+            scanner.IScan.AdvanceFilm(advanceMilliseconds, advanceSpeed);
         }
     }
 

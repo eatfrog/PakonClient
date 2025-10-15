@@ -1,4 +1,4 @@
 ﻿// Pakon.TLXSaveProgress
 using PakonLib;
 
-public delegate void TLXSaveProgress(WorkerThreadOperation wtoOperation, int lStatus);
+public delegate void TLXSaveProgress(WorkerThreadOperation wtoOperation, int status);

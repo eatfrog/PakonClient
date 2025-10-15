@@ -5,20 +5,20 @@ using TLXLib;
 
 public class CallBackClient : ICallBackClient
 {
-    private Scanner m_csScanner;
+    private Scanner scanner;
 
-    public CallBackClient(Scanner csScanner)
+    public CallBackClient(Scanner scannerInstance)
     {
-        m_csScanner = csScanner;
+        scanner = scannerInstance;
     }
 
-    public void Awake(int lOperation, int lStatus)
+    public void Awake(int operationValue, int status)
     {
-        if (lStatus == 3000)
+        if (status == 3000)
         {
             Thread.Sleep(300);
         }
-        WorkerThreadOperation operation = (WorkerThreadOperation)lOperation;
-        m_csScanner.TLXAwake(operation, lStatus);
+        WorkerThreadOperation operation = (WorkerThreadOperation)operationValue;
+        scanner.TLXAwake(operation, status);
     }
 }
