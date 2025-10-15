@@ -65,11 +65,11 @@ namespace PakonLib
             m_csScannerSave = new ScannerSave(m_csTLX, m_csUnsafe);
         }
 
-        public void TLXAwake(WORKER_THREAD_OPERATION_000 lOperation, int lStatus)
+        public void TLXAwake(WORKER_THREAD_OPERATION_000 wtoOperation, int lStatus)
         {
-            WORKER_THREAD_OPERATION_000 wORKER_THREAD_OPERATION_ = WORKER_THREAD_OPERATION_000.WTO_InitializeProgress;
+            WORKER_THREAD_OPERATION_000 wORKER_THREAD_OPERATION_ = wtoOperation;
 
-            switch (lOperation)
+            switch (wtoOperation)
             {
                 case WORKER_THREAD_OPERATION_000.WTO_InitializeError:
                 case WORKER_THREAD_OPERATION_000.WTO_FirmwareUpdateApsError:
