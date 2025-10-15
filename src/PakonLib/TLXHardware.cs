@@ -1,4 +1,4 @@
 ﻿// Pakon.TLXHardware
-using TLXLib;
+using PakonLib;
 
-public delegate void TLXHardware(WORKER_THREAD_OPERATION_000 wtoOperation, int lStatus);
+public delegate void TLXHardware(WorkerThreadOperation wtoOperation, int lStatus);
