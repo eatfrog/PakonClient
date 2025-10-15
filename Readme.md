@@ -25,6 +25,7 @@ _Possibilites maybe?_
 _Important links_
 
 [Kai Kaufman](https://ktkaufman03.github.io/blog/2022/09/04/pakon-reverse-engineering/) has made important progress on reverse engineering the pakon driver and have gotten them to work on 64bit Windows.
+Check the source for his driver [here](https://github.com/ktkaufman03/FX35).
 
 _How to build_
 
