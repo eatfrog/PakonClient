@@ -23,4 +23,9 @@ _Possibilites maybe?_
 - Streamlined client for getting raw scans, together with [my raw converter](https://github.com/eatfrog/pakonrawconverter) you could reduce the number of clicks a lot to get a good nice 16 bit scans
 
 _Important links_
+
 [Kai Kaufman](https://ktkaufman03.github.io/blog/2022/09/04/pakon-reverse-engineering/) has made important progress on reverse engineering the pakon driver and have gotten them to work on 64bit Windows.
+
+_How to build_
+
+There is something weird going on with msvcp71.dll and msvcr71.dll. It needs to be in the folder of the executable and also the F-X35 COM SERVER folder. Probably it is in system32 on a winxp machine but missing on anything more modern? I am not sure what is going on here. If you are seeing a PartitionAlreadySelected error it is most likely due to this. You have logs in C:\Program Files (x86)\Pakon\F-X35 COM SERVER that you can check for more info.

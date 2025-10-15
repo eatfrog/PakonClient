@@ -17,11 +17,11 @@ namespace ConsoleClient
         [STAThread]
         static void Main(string[] args)
         {
+            //Console.ReadKey();
+            Console.WriteLine("Creating new scanner");
+            var scanner = new Scanner();
             try
             {
-                //Console.ReadKey();
-                Console.WriteLine("Creating new scanner");
-                var scanner = new Scanner();
 
                 scanner.m_evTLXScanProgress += (a, b) =>
                 {
@@ -32,6 +32,7 @@ namespace ConsoleClient
                 {
                     var errorCode = (ERROR_CODES_000)c;
                     Console.WriteLine("Error event: " + a + " - " + errorCode);
+                    throw new Exception(a + "- " + errorCode);
                 };
 
                 scanner.m_evTLXHardware += (a, c) =>
@@ -118,10 +119,17 @@ namespace ConsoleClient
             catch (Exception ex)
             {
                 ERROR_CODES_000 errorCode = (ERROR_CODES_000)1;
+                string error = String.Empty;
+                string errornumbers = String.Empty;
+                WORKER_THREAD_OPERATION_000 wtoperation = WORKER_THREAD_OPERATION_000.WTO_TLXError;
+
+                scanner.GetAndClearLastErrorTLX(wtoperation, ref error, ref errornumbers, out int returnint);
                 if (Enum.TryParse<ERROR_CODES_000>(ex.Message, out errorCode))
-                    Console.WriteLine(errorCode);
+                    Console.WriteLine(error);
                 else
-                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(ex.Message + " Error: " + error);
+
+                Thread.Sleep(3000);
             }
 
         }
