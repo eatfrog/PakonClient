@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Delegates\AddPictureToSaveGroup.cs" />
     <Compile Include="CallBackClient.cs" />
+    <Compile Include="ErrorCode.cs" />
     <Compile Include="Enums\InitializationRequest.cs" />
     <Compile Include="Enums\WorkerThreadOperation.cs" />
     <Compile Include="Global.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="Delegates\TLXHardware.cs" />
     <Compile Include="Delegates\TLXSaveProgress.cs" />
     <Compile Include="Delegates\TLXScanProgress.cs" />
+    <Compile Include="WorkerThreadProgress.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="TLXLib">
