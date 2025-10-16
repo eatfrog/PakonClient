@@ -1,5 +1,4 @@
 using System;
-using TLXLib;
 using PakonLib.Enums;
 using PakonLib.Models;
 
@@ -195,29 +194,29 @@ namespace PakonLib
             scanner.CBUnadviseTLX();
         }
 
-        public int GetResolutionHeight(Scanner scanner, RESOLUTION_000 resolution, FILM_FORMAT_000 filmFormat)
+        public int GetResolutionHeight(Scanner scanner, Resolution resolution, FilmFormat filmFormat)
         {
             return Global.GetResolutionHeight(Type, resolution, filmFormat);
         }
 
         public void Scan(Scanner scanner)
         {
-            FILM_COLOR_000 filmColor = FILM_COLOR_000.FILM_COLOR_NEGATIVE;
-            FILM_FORMAT_000 filmFormat = FILM_FORMAT_000.FILM_FORMAT_35MM;
-            RESOLUTION_000 resolution = RESOLUTION_000.RESOLUTION_BASE_4;
-            STRIP_MODE_000 stripMode = STRIP_MODE_000.STRIP_MODE_FULL_ROLL;
-            SCAN_CONTROL_000 scanControl = SCAN_CONTROL_000.SCAN_None;
+            FilmColor filmColor = FilmColor.Negative;
+            FilmFormat filmFormat = FilmFormat.Format35mm;
+            Resolution resolution = Resolution.Base4;
+            StripMode stripMode = StripMode.FullRoll;
+            ScanControl scanControl = ScanControl.None;
             if (Type == ScannerType.F135)
             {
-                resolution = RESOLUTION_000.RESOLUTION_BASE_4;
+                resolution = Resolution.Base4;
             }
             else if (Type == ScannerType.F235 || Type == ScannerType.F235C || Type == ScannerType.F135Plus)
             {
-                resolution = RESOLUTION_000.RESOLUTION_BASE_8;
+                resolution = Resolution.Base8;
             }
             else if (Type == ScannerType.F335 || Type == ScannerType.F335C)
             {
-                resolution = RESOLUTION_000.RESOLUTION_BASE_8;
+                resolution = Resolution.Base8;
             }
 
             scanner.IScan.ScanPictures(resolution, filmColor, filmFormat, stripMode, scanControl);

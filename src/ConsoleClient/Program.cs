@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using TLXLib;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -83,11 +82,11 @@ namespace ConsoleClient
                 Console.WriteLine("Start scan");
                 _wtProgress = WorkerThreadProgress.Initialize;
                 scanner.IScan.ScanPictures(
-                    RESOLUTION_000.RESOLUTION_BASE_8,
-                    FILM_COLOR_000.FILM_COLOR_NEGATIVE,
-                    FILM_FORMAT_000.FILM_FORMAT_35MM,
-                    STRIP_MODE_000.STRIP_MODE_FULL_ROLL,
-                    SCAN_CONTROL_000.SCAN_None);
+                    Resolution.Base8,
+                    FilmColor.Negative,
+                    FilmFormat.Format35mm,
+                    StripMode.FullRoll,
+                    ScanControl.None);
 
                 while (_wtProgress != WorkerThreadProgress.ProgressComplete)
                 {
