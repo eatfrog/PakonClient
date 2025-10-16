@@ -49,12 +49,17 @@
     <Compile Include="ErrorCode.cs" />
     <Compile Include="Enums\InitializationRequest.cs" />
     <Compile Include="Enums\FileFormat.cs" />
+    <Compile Include="Enums\FilmColor.cs" />
+    <Compile Include="Enums\FilmFormat.cs" />
     <Compile Include="Enums\MemoryFileFormat.cs" />
     <Compile Include="Enums\PictureIndex.cs" />
     <Compile Include="Enums\PictureSelection.cs" />
+    <Compile Include="Enums\Resolution.cs" />
     <Compile Include="Enums\SaveControl.cs" />
+    <Compile Include="Enums\ScanControl.cs" />
     <Compile Include="Enums\ScannerType.cs" />
     <Compile Include="Enums\ScalingMethod.cs" />
+    <Compile Include="Enums\StripMode.cs" />
     <Compile Include="Enums\WorkerThreadOperation.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Delegates\ImageFromClientBuffer.cs" />

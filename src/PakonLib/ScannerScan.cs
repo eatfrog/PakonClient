@@ -14,20 +14,20 @@ namespace PakonLib
             tlx = tlxMain;
         }
 
-        public void FocusCorrection(RESOLUTION_000 resolution, FILM_COLOR_000 filmColor, FILM_FORMAT_000 filmFormat, bool advanceFilm)
+        public void FocusCorrection(Resolution resolution, FilmColor filmColor, FilmFormat filmFormat, bool advanceFilm)
         {
             CALIBRATE_CONTROL_000 calibrateControl = (advanceFilm ? CALIBRATE_CONTROL_000.CALIBRATE_FocusAdvanceFilm : CALIBRATE_CONTROL_000.CALIBRATE_Focus);
-            tlx.ForceCorrections((int)resolution, (int)filmColor, (int)filmFormat, (int)calibrateControl);
+            tlx.ForceCorrections((int)resolution.NativeValue, (int)filmColor.NativeValue, (int)filmFormat.NativeValue, (int)calibrateControl);
         }
 
-        public void LightCorrection(RESOLUTION_000 resolution, FILM_COLOR_000 filmColor, FILM_FORMAT_000 filmFormat, bool includeIr)
+        public void LightCorrection(Resolution resolution, FilmColor filmColor, FilmFormat filmFormat, bool includeIr)
         {
             CALIBRATE_CONTROL_000 calibrateControl = CALIBRATE_CONTROL_000.CALIBRATE_Light;
             if (includeIr)
             {
                 calibrateControl |= CALIBRATE_CONTROL_000.CALIBRATE_UseScratchRemoval;
             }
-            tlx.ForceCorrections((int)resolution, (int)filmColor, (int)filmFormat, (int)calibrateControl);
+            tlx.ForceCorrections((int)resolution.NativeValue, (int)filmColor.NativeValue, (int)filmFormat.NativeValue, (int)calibrateControl);
         }
 
         public void FilmTrackTest(bool adjustPots)
@@ -41,10 +41,16 @@ namespace PakonLib
             return tlx.FilmTrackTestResults();
         }
 
-        public void ScanPictures(RESOLUTION_000 resolution, FILM_COLOR_000 filmColor, FILM_FORMAT_000 filmFormat, STRIP_MODE_000 stripMode, SCAN_CONTROL_000 scanControl)
+        public void ScanPictures(Resolution resolution, FilmColor filmColor, FilmFormat filmFormat, StripMode stripMode, ScanControl scanControl)
         {
             string rollId = "1000";
-            tlx.ScanPictures((int)resolution, (int)filmColor, (int)filmFormat, (int)stripMode, (int)scanControl, rollId);
+            tlx.ScanPictures(
+                (int)resolution.NativeValue,
+                (int)filmColor.NativeValue,
+                (int)filmFormat.NativeValue,
+                (int)stripMode.NativeValue,
+                (int)scanControl.NativeValue,
+                rollId);
         }
 
         public void ScanCancel()

@@ -125,13 +125,13 @@ public class Global
         }
     }
 
-    public static int GetResolutionHeight(ScannerType scannerType, RESOLUTION_000 resolution, FILM_FORMAT_000 filmFormat)
+    public static int GetResolutionHeight(ScannerType scannerType, Resolution resolution, FilmFormat filmFormat)
     {
         FRAME_SIZES_000 result = FRAME_SIZES_000.FRAME_SIZES_HR_HEIGHT_BASE16_35;
-        switch (filmFormat)
+        switch (filmFormat.NativeValue)
         {
             case FILM_FORMAT_000.FILM_FORMAT_24MM:
-                switch (resolution)
+                switch (resolution.NativeValue)
                 {
                     case RESOLUTION_000.RESOLUTION_BASE_4:
                         result = FRAME_SIZES_000.FRAME_SIZES_HR_HEIGHT_BASE4_24;
@@ -146,7 +146,7 @@ public class Global
 
                 break;
             case FILM_FORMAT_000.FILM_FORMAT_35MM:
-                switch (resolution)
+                switch (resolution.NativeValue)
                 {
                     case RESOLUTION_000.RESOLUTION_BASE_4:
                         result = FRAME_SIZES_000.FRAME_SIZES_HR_HEIGHT_BASE4_35;
