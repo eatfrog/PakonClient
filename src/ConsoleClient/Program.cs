@@ -13,7 +13,7 @@ namespace ConsoleClient
 {
     class Program
     {
-        static WORKER_THREAD_PROGRESS_000 _wtProgress = WORKER_THREAD_PROGRESS_000.WTP_Initialize;
+        static WorkerThreadProgress _wtProgress = WorkerThreadProgress.Initialize;
 
         static Scanner scanner;
 
@@ -35,25 +35,25 @@ namespace ConsoleClient
 
                 scanner.TlxScanProgress += (a, b) =>
                 {
-                    _wtProgress = (WORKER_THREAD_PROGRESS_000)b;
+                    _wtProgress = WorkerThreadProgress.FromValue(b);
                     Console.WriteLine("Scan event: " + a + " - " + _wtProgress);
                 };
                 scanner.TlxError += (a, c) =>
                 {
-                    var errorCode = (ERROR_CODES_000)c;
+                    var errorCode = ErrorCode.FromValue(c);
                     Console.WriteLine("Error event: " + a + " - " + errorCode);
-                    throw new Exception(a + "- " + errorCode);
+                    throw new Exception(errorCode.Name);
                 };
 
                 scanner.TlxHardware += (a, c) =>
                 {
-                    var errorCode = (ERROR_CODES_000)c;
+                    var errorCode = ErrorCode.FromValue(c);
                     Console.WriteLine("Hardware event: " + a + " - " + errorCode);
                 };
 
                 scanner.TlxSaveProgress += (a, b) =>
                 {
-                    _wtProgress = (WORKER_THREAD_PROGRESS_000)b;
+                    _wtProgress = WorkerThreadProgress.FromValue(b);
                     Console.WriteLine("Save event: " + a + " - " + _wtProgress);
                 };
 
@@ -63,7 +63,7 @@ namespace ConsoleClient
                 ClearErrors();
                 scanner.InitializeTLX(InitializationRequest.CSharpClient);
                 
-                while (_wtProgress != WORKER_THREAD_PROGRESS_000.WTP_ProgressComplete)
+                while (_wtProgress != WorkerThreadProgress.ProgressComplete)
                 {
                     Console.Write(".");
                     Thread.Sleep(100);
@@ -88,7 +88,7 @@ namespace ConsoleClient
                 Console.WriteLine("{0} {1} {2} {3} {4}", type, serial, scannerhw1, scannerhw2, scannerhw3);
 
                 Console.WriteLine("Start scan");
-                _wtProgress = WORKER_THREAD_PROGRESS_000.WTP_Initialize;
+                _wtProgress = WorkerThreadProgress.Initialize;
                 scanner.IScan.ScanPictures(
                     RESOLUTION_000.RESOLUTION_BASE_8,
                     FILM_COLOR_000.FILM_COLOR_NEGATIVE,
@@ -96,7 +96,7 @@ namespace ConsoleClient
                     STRIP_MODE_000.STRIP_MODE_FULL_ROLL,
                     SCAN_CONTROL_000.SCAN_None);
 
-                while (_wtProgress != WORKER_THREAD_PROGRESS_000.WTP_ProgressComplete)
+                while (_wtProgress != WorkerThreadProgress.ProgressComplete)
                 {
                     Thread.Sleep(100);
                 }
@@ -106,7 +106,7 @@ namespace ConsoleClient
                 scanner.ISave.MoveOldestRollToSaveGroup();
 
                 Console.WriteLine("Saving to disk");
-                _wtProgress = WORKER_THREAD_PROGRESS_000.WTP_Initialize;
+                _wtProgress = WorkerThreadProgress.Initialize;
                 scanner.ISave.SaveToDisk(
                     INDEX_000.INDEX_All,
                     SAVE_CONTROL_000.SAV_SizeOriginal,
@@ -118,7 +118,7 @@ namespace ConsoleClient
                     300,
                     24);
 
-                while (_wtProgress != WORKER_THREAD_PROGRESS_000.WTP_ProgressComplete)
+                while (_wtProgress != WorkerThreadProgress.ProgressComplete)
                 {
                     Thread.Sleep(100);
                 }
@@ -138,31 +138,34 @@ namespace ConsoleClient
 
         private static void ClearErrors(Exception ex)
         {
-            ERROR_CODES_000 errorCode;
             string error = String.Empty;
             string errornumbers = String.Empty;
             int returnint = 0;
             do
             {
                 scanner.GetAndClearLastErrorTLX(WorkerThreadOperation.TlxError, ref error, ref errornumbers, out returnint);
-                if (Enum.TryParse<ERROR_CODES_000>(ex.Message, out errorCode))
+                var errorCode = ErrorCode.FromValue(returnint);
+                if (ErrorCode.TryParse(ex.Message, out var parsedFromMessage) && parsedFromMessage == errorCode)
+                {
                     Console.WriteLine(error);
+                }
                 else
-                    Console.WriteLine($"TLX error - exception: {ex.Message} message: {error} num: {errornumbers} int: {returnint}");
+                {
+                    Console.WriteLine($"TLX error - exception: {ex.Message} message: {error} num: {errornumbers} int: {errorCode.RawValue} ({errorCode})");
+                }
             } while (returnint == 25);
         }
 
         private static void ClearErrors()
         {
-            ERROR_CODES_000 errorCode;
             string error = String.Empty;
             string errornumbers = String.Empty;
             int returnint = 0;
             do
             {
                 scanner.GetAndClearLastErrorTLX(WorkerThreadOperation.TlxError, ref error, ref errornumbers, out returnint);
-                errorCode = (ERROR_CODES_000)returnint;
-                Console.WriteLine($"TLX error - message: {error} num: {errornumbers} int: {returnint}");
+                var errorCode = ErrorCode.FromValue(returnint);
+                Console.WriteLine($"TLX error - message: {error} num: {errornumbers} int: {errorCode.RawValue} ({errorCode})");
             } while (returnint == 25);
         }
 
