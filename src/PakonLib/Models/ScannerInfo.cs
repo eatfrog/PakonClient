@@ -1,12 +1,11 @@
 using PakonLib.Enums;
-using TLXLib;
 
 namespace PakonLib.Models
 {
     public class ScannerInfo
     {
         public ScannerInfo(
-            SCANNER_TYPE_000 scannerType,
+            ScannerType scannerType,
             int scannerSerialNumber,
             ScannerHW135 hardware135,
             ScannerHW235 hardware235,
@@ -19,7 +18,7 @@ namespace PakonLib.Models
             Hardware335 = hardware335;
         }
 
-        public SCANNER_TYPE_000 ScannerType { get; }
+        public ScannerType ScannerType { get; }
 
         public int ScannerSerialNumber { get; }
 

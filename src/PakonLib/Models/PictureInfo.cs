@@ -1,4 +1,4 @@
-using TLXLib;
+using PakonLib.Enums;
 
 namespace PakonLib.Models
 {
@@ -15,7 +15,7 @@ namespace PakonLib.Models
             string fileName,
             string directory,
             int rotation,
-            S_OR_H_000 selectedHidden)
+            PictureSelection selectedHidden)
         {
             RollIndexFromStrip = rollIndexFromStrip;
             StripIndexFromStrip = stripIndexFromStrip;
@@ -50,6 +50,6 @@ namespace PakonLib.Models
 
         public int Rotation { get; }
 
-        public S_OR_H_000 SelectedHidden { get; }
+        public PictureSelection SelectedHidden { get; }
     }
 }
