@@ -1,10 +1,10 @@
 ﻿// Pakon.Scanner
 using System;
 using TLXLib;
-using PakonLib;
 using System.Runtime.InteropServices;
 using PakonLib.Enums;
 using PakonLib.Interfaces;
+using PakonLib.Models;
 
 namespace PakonLib 
 {
@@ -185,7 +185,7 @@ namespace PakonLib
             InitializeTLX(InitializationRequest.FromNative(iInitializeControl));
         }
 
-        public void GetAndClearLastErrorTLX(WorkerThreadOperation operation, ref string strError, ref string strErrorNumbers, out int returnValue)
+        public ScannerErrorInfo GetAndClearLastErrorTLX(WorkerThreadOperation operation)
         {
             INT_IID_000 shortInterfaceId = INT_IID_000.INT_IID_ITLAMain;
             switch (operation)
@@ -219,14 +219,17 @@ namespace PakonLib
                     shortInterfaceId = INT_IID_000.INT_IID_ITLXMain;
                     break;
             }
-            returnValue = tlx.GetAndClearLastError((int)shortInterfaceId, ref strError, ref strErrorNumbers);
+            string errorMessage = string.Empty;
+            string errorNumbers = string.Empty;
+            int returnValue = tlx.GetAndClearLastError((int)shortInterfaceId, ref errorMessage, ref errorNumbers);
+            return new ScannerErrorInfo(errorMessage, errorNumbers, returnValue);
         }
 
-        public void GetInitializeWarnings(ref ScannerInitializeWarnings iwScanner)
+        public ScannerInitializeWarnings GetInitializeWarnings()
         {
             int initializeWarnings = 0;
             tlx.GetInitializeWarnings(ref initializeWarnings);
-            iwScanner = (ScannerInitializeWarnings)initializeWarnings;
+            return (ScannerInitializeWarnings)initializeWarnings;
         }
 
         public void CBUnadviseTLX()

@@ -5,6 +5,7 @@ using System.Text;
 using PakonLib;
 using TLXLib;
 using PakonLib.Enums;
+using PakonLib.Models;
 namespace PakonLib.Interfaces
 {
     public interface IScanPictures
@@ -27,11 +28,7 @@ namespace PakonLib.Interfaces
 
         void AdvanceFilm(int iAdvanceMilliseconds, int iAdvanceSpeed);
 
-        void GetScannerInfo000(ref SCANNER_TYPE_000 iScannerType, 
-            ref int iScannerSerialNumber, 
-            ref ScannerHW135 iHw135, 
-            ref ScannerHW235 iHw235, 
-            ref ScannerHW335 iHw335);
+        ScannerInfo GetScannerInfo();
     }
 
 }

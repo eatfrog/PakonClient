@@ -1,7 +1,7 @@
 ﻿// Pakon.ScannerSave
 using TLXLib;
-using PakonLib;
 using PakonLib.Interfaces;
+using PakonLib.Models;
 
 public class ScannerSave : PakonLib.Interfaces.ISavePictures, PakonLib.Interfaces.ISavePictures3
 {
@@ -15,9 +15,13 @@ public class ScannerSave : PakonLib.Interfaces.ISavePictures, PakonLib.Interface
         scannerUnsafe = scannerUnsafeInstance;
     }
 
-    public void GetPictureCountScanGroup(int iRollIndex, ref int iStripCount, ref int iPictureCount, ref int iScanWarnings)
+    public PictureCountScanGroupResult GetPictureCountScanGroup(int iRollIndex)
     {
-        tlx.GetPictureCountScanGroup(iRollIndex, ref iStripCount, ref iPictureCount, ref iScanWarnings);
+        int stripCount = 0;
+        int pictureCount = 0;
+        int scanWarnings = 0;
+        tlx.GetPictureCountScanGroup(iRollIndex, ref stripCount, ref pictureCount, ref scanWarnings);
+        return new PictureCountScanGroupResult(stripCount, pictureCount, scanWarnings);
     }
 
     public void MoveOldestRollToSaveGroup()
@@ -25,9 +29,15 @@ public class ScannerSave : PakonLib.Interfaces.ISavePictures, PakonLib.Interface
         tlx.MoveOldestRollToSaveGroup();
     }
 
-    public void GetPictureCountSaveGroup(ref int iRollCount, ref int iStripCount, ref int iPictureCount, ref int iPictureSelectedCount, ref int iPictureHiddenCount)
+    public PictureCountSaveGroupResult GetPictureCountSaveGroup()
     {
-        tlx.GetPictureCountSaveGroup(ref iRollCount, ref iStripCount, ref iPictureCount, ref iPictureSelectedCount, ref iPictureHiddenCount);
+        int rollCount = 0;
+        int stripCount = 0;
+        int pictureCount = 0;
+        int pictureSelectedCount = 0;
+        int pictureHiddenCount = 0;
+        tlx.GetPictureCountSaveGroup(ref rollCount, ref stripCount, ref pictureCount, ref pictureSelectedCount, ref pictureHiddenCount);
+        return new PictureCountSaveGroupResult(rollCount, stripCount, pictureCount, pictureSelectedCount, pictureHiddenCount);
     }
 
     public void SaveToDisk(INDEX_000 eIndex, SAVE_CONTROL_000 eSaveControl, int iBoundingWidth, int iBoundingHeight, SCALING_METHOD_000 eScalingMethod, FILE_FORMAT_000 eFileFormat, int iCompression, int iDpi, int iColorBits)
@@ -58,11 +68,22 @@ public class ScannerSave : PakonLib.Interfaces.ISavePictures, PakonLib.Interface
         tlx.SaveCancel();
     }
 
-    public void GetPictureInfo3(int iIndex, out int iRollIndexFromStrip, out int iStripIndexFromStrip, out int iFilmProductFromStrip, out int iFilmSpecifierFromStrip, out string strFrameName, out int iFrameNumber, out int iPrintAspectRatio, out string strFileName, out string strDirectory, out int iRotation, out S_OR_H_000 eSelectedHidden)
+    public PictureInfo GetPictureInfo3(int iIndex)
     {
         int piSelectedHidden = 0;
-        tlx.GetPictureInfo3(iIndex, out iRollIndexFromStrip, out iStripIndexFromStrip, out iFilmProductFromStrip, out iFilmSpecifierFromStrip, out strFrameName, out iFrameNumber, out iPrintAspectRatio, out strFileName, out strDirectory, out iRotation, out piSelectedHidden);
-        eSelectedHidden = (S_OR_H_000)piSelectedHidden;
+        int rollIndexFromStrip;
+        int stripIndexFromStrip;
+        int filmProductFromStrip;
+        int filmSpecifierFromStrip;
+        string frameName;
+        int frameNumber;
+        int printAspectRatio;
+        string fileName;
+        string directory;
+        int rotation;
+        tlx.GetPictureInfo3(iIndex, out rollIndexFromStrip, out stripIndexFromStrip, out filmProductFromStrip, out filmSpecifierFromStrip, out frameName, out frameNumber, out printAspectRatio, out fileName, out directory, out rotation, out piSelectedHidden);
+        S_OR_H_000 selectedHidden = (S_OR_H_000)piSelectedHidden;
+        return new PictureInfo(rollIndexFromStrip, stripIndexFromStrip, filmProductFromStrip, filmSpecifierFromStrip, frameName, frameNumber, printAspectRatio, fileName, directory, rotation, selectedHidden);
     }
 
     public void PutPictureInfo(int iIndex, int iFrameNumber, string strFileName, string strDirectory, int iRotation, S_OR_H_000 eSelectedHidden)
@@ -75,21 +96,23 @@ public class ScannerSave : PakonLib.Interfaces.ISavePictures, PakonLib.Interface
         tlx.PutPictureSelection((int)eIndex, (int)eSelectOrHidden, bSkipHidden ? 1 : 0);
     }
 
-    public void GetPictureFramingUserInfo(int iIndex, ref int iLeftHR, ref int iTopHR, ref int iRightHR, ref int iBottomHR)
+    public PictureFramingInfo GetPictureFramingUserInfo(int iIndex)
     {
-        iLeftHR = 0;
-        iTopHR = 0;
-        iRightHR = 0;
-        iBottomHR = 0;
-        tlx.GetPictureFramingUserInfo(iIndex, ref iLeftHR, ref iTopHR, ref iRightHR, ref iBottomHR);
+        int left = 0;
+        int top = 0;
+        int right = 0;
+        int bottom = 0;
+        tlx.GetPictureFramingUserInfo(iIndex, ref left, ref top, ref right, ref bottom);
+        return new PictureFramingInfo(left, top, right, bottom);
     }
 
-    public void GetPictureFramingUserInfoLowRes(int iIndex, ref int iLeftLR, ref int iTopLR, ref int iRightLR, ref int iBottomLR)
+    public PictureFramingInfo GetPictureFramingUserInfoLowRes(int iIndex)
     {
-        iLeftLR = 0;
-        iTopLR = 0;
-        iRightLR = 0;
-        iBottomLR = 0;
-        tlx.GetPictureFramingUserInfoLowRes(iIndex, ref iLeftLR, ref iTopLR, ref iRightLR, ref iBottomLR);
+        int left = 0;
+        int top = 0;
+        int right = 0;
+        int bottom = 0;
+        tlx.GetPictureFramingUserInfoLowRes(iIndex, ref left, ref top, ref right, ref bottom);
+        return new PictureFramingInfo(left, top, right, bottom);
 }
 }

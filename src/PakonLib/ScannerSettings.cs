@@ -1,7 +1,7 @@
 ﻿using System;
-using PakonLib;
 using TLXLib;
 using PakonLib.Enums;
+using PakonLib.Models;
 
 namespace PakonLib
 {
@@ -222,8 +222,13 @@ namespace PakonLib
 
         public void CompleteTLXInitialization(Scanner scanner)
         {
-            scanner.GetInitializeWarnings(ref initializeWarnings);
-            scanner.IScan.GetScannerInfo000(ref scannerType, ref serialNumber, ref hardware135, ref hardware235, ref hardware335);
+            initializeWarnings = scanner.GetInitializeWarnings();
+            ScannerInfo scannerInfo = scanner.IScan.GetScannerInfo();
+            scannerType = scannerInfo.ScannerType;
+            serialNumber = scannerInfo.ScannerSerialNumber;
+            hardware135 = scannerInfo.Hardware135;
+            hardware235 = scannerInfo.Hardware235;
+            hardware335 = scannerInfo.Hardware335;
             SetCapabilities();
         }
 
