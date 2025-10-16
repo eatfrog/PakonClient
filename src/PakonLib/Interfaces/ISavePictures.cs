@@ -1,15 +1,16 @@
 ﻿// Pakon.ISavePictures
 using TLXLib;
+using PakonLib.Models;
 
 namespace PakonLib.Interfaces
 {
     public interface ISavePictures
     {
-        void GetPictureCountScanGroup(int iRollIndex, ref int iStripCount, ref int iPictureCount, ref int iScanWarnings);
+        PictureCountScanGroupResult GetPictureCountScanGroup(int iRollIndex);
 
         void MoveOldestRollToSaveGroup();
 
-        void GetPictureCountSaveGroup(ref int iRollCount, ref int iStripCount, ref int iPictureCount, ref int iPictureSelectedCount, ref int iPictureHiddenCount);
+        PictureCountSaveGroupResult GetPictureCountSaveGroup();
 
         void SaveToDisk(INDEX_000 eIndex, SAVE_CONTROL_000 eSaveControl, int iBoundingWidth, int iBoundingHeight, SCALING_METHOD_000 eScalingMethod, FILE_FORMAT_000 eFileFormat, int iCompression, int iDpi, int iColorBits);
 
@@ -25,9 +26,9 @@ namespace PakonLib.Interfaces
 
         void PutPictureSelection(INDEX_000 eIndex, S_OR_H_000 eSelectOrHidden, bool bSkipHidden);
 
-        void GetPictureFramingUserInfo(int iIndex, ref int iLeftHR, ref int iTopHR, ref int iRightHR, ref int iBottomHR);
+        PictureFramingInfo GetPictureFramingUserInfo(int iIndex);
 
-        void GetPictureFramingUserInfoLowRes(int iIndex, ref int iLeftLR, ref int iTopLR, ref int iRightLR, ref int iBottomLR);
+        PictureFramingInfo GetPictureFramingUserInfoLowRes(int iIndex);
     }
 }
 

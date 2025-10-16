@@ -1,6 +1,6 @@
 ﻿using System;
-using PakonLib;
 using TLXLib;
+using PakonLib.Models;
 
 namespace PakonLib
 {
@@ -66,17 +66,14 @@ namespace PakonLib
 
         public void MoveRollToSaveGroup(Scanner scanner)
         {
-            int rollCount = 0;
-            int pictureCount = 0;
-            int picturesToAdd = 0;
-            scanner.ISave.GetPictureCountSaveGroup(ref rollCount, ref rollCount, ref pictureCount, ref rollCount, ref rollCount);
-            if (pictureCount > 0)
+            PictureCountSaveGroupResult saveGroupCounts = scanner.ISave.GetPictureCountSaveGroup();
+            if (saveGroupCounts.PictureCount > 0)
             {
                 scanner.ISave.PutPictureSelection(INDEX_000.INDEX_All, S_OR_H_000.S_OR_H_NONE, true);
             }
-            scanner.ISave.GetPictureCountScanGroup(0, ref rollCount, ref picturesToAdd, ref rollCount);
+            PictureCountScanGroupResult scanGroupCounts = scanner.ISave.GetPictureCountScanGroup(0);
             scanner.ISave.MoveOldestRollToSaveGroup();
-            for (int i = pictureCount; i < pictureCount + picturesToAdd; i++)
+            for (int i = saveGroupCounts.PictureCount; i < saveGroupCounts.PictureCount + scanGroupCounts.PictureCount; i++)
             {
                 PictureAddedToSaveGroup?.Invoke(i);
             }
@@ -84,18 +81,12 @@ namespace PakonLib
 
         public void SetPictureInfo(Scanner scanner, int indexValue, int newFrameNumber, string newFileName, string newDirectory, int newRotation, S_OR_H_000 newSelectedHidden, IntBits info)
         {
-            int rollIndexFromStrip;
-            int stripIndexFromStrip;
-            int filmProductFromStrip;
-            int filmSpecifierFromStrip;
-            string frameName;
-            int frameNumber;
-            int printAspectRatio;
-            string fileName;
-            string directory;
-            int rotation;
-            S_OR_H_000 selectedHidden;
-            scanner.ISave3.GetPictureInfo3(indexValue, out rollIndexFromStrip, out stripIndexFromStrip, out filmProductFromStrip, out filmSpecifierFromStrip, out frameName, out frameNumber, out printAspectRatio, out fileName, out directory, out rotation, out selectedHidden);
+            PictureInfo pictureInfo = scanner.ISave3.GetPictureInfo3(indexValue);
+            int frameNumber = pictureInfo.FrameNumber;
+            string fileName = pictureInfo.FileName;
+            string directory = pictureInfo.Directory;
+            int rotation = pictureInfo.Rotation;
+            S_OR_H_000 selectedHidden = pictureInfo.SelectedHidden;
             if (info[0])
             {
                 frameNumber = newFrameNumber;
@@ -119,11 +110,10 @@ namespace PakonLib
             scanner.ISave.PutPictureInfo(indexValue, frameNumber, fileName, directory, rotation, selectedHidden);
         }
 
-        private void FindBoundingRectangle(Scanner scanner, out int boundingWidth, out int boundingHeight, out int bufferByteCount, bool fourChannel)
+        private BoundingRectangleMetrics FindBoundingRectangle(Scanner scanner, bool fourChannel)
         {
-            int rollCount = 0;
-            int pictureCount = 0;
-            scanner.ISave.GetPictureCountSaveGroup(ref rollCount, ref rollCount, ref pictureCount, ref rollCount, ref rollCount);
+            PictureCountSaveGroupResult saveGroupCounts = scanner.ISave.GetPictureCountSaveGroup();
+            int pictureCount = saveGroupCounts.PictureCount;
             int startIndex;
             int endIndex;
             switch (index)
@@ -149,39 +139,25 @@ namespace PakonLib
                     endIndex = startIndex + 1;
                     break;
             }
-            boundingWidth = 0;
-            boundingHeight = 0;
-            bufferByteCount = 0;
+            int boundingWidth = 0;
+            int boundingHeight = 0;
+            int bufferByteCount = 0;
             for (int currentIndex = startIndex; currentIndex < endIndex; currentIndex++)
             {
                 bool flag = true;
                 if (index == INDEX_000.INDEX_AllSelected)
                 {
-                    S_OR_H_000 selectedHidden = S_OR_H_000.S_OR_H_NONE;
                     PakonLib.Interfaces.ISavePictures3 saveInterface = scanner.ISave3;
-                    int pictureIndex = currentIndex;
-                    string frameName = null;
-                    string fileName = null;
-                    string directory = null;
-                    saveInterface.GetPictureInfo3(pictureIndex, out rollCount, out rollCount, out rollCount, out rollCount, out frameName, out rollCount, out rollCount, out fileName, out directory, out rollCount, out selectedHidden);
-                    flag = selectedHidden == S_OR_H_000.S_OR_H_SELECTED;
+                    PictureInfo pictureInfo = saveInterface.GetPictureInfo3(currentIndex);
+                    flag = pictureInfo.SelectedHidden == S_OR_H_000.S_OR_H_SELECTED;
                 }
                 if (flag)
                 {
-                    int left = 0;
-                    int top = 0;
-                    int right = 0;
-                    int bottom = 0;
-                    if ((saveControl & SAVE_CONTROL_000.SAV_UseLoResBuffer) == SAVE_CONTROL_000.SAV_UseLoResBuffer)
-                    {
-                        scanner.ISave.GetPictureFramingUserInfoLowRes(currentIndex, ref left, ref top, ref right, ref bottom);
-                    }
-                    else
-                    {
-                        scanner.ISave.GetPictureFramingUserInfo(currentIndex, ref left, ref top, ref right, ref bottom);
-                    }
-                    int width = right + 1 - left;
-                    int height = bottom + 1 - top;
+                    PictureFramingInfo framingInfo = ((saveControl & SAVE_CONTROL_000.SAV_UseLoResBuffer) == SAVE_CONTROL_000.SAV_UseLoResBuffer)
+                        ? scanner.ISave.GetPictureFramingUserInfoLowRes(currentIndex)
+                        : scanner.ISave.GetPictureFramingUserInfo(currentIndex);
+                    int width = framingInfo.Right + 1 - framingInfo.Left;
+                    int height = framingInfo.Bottom + 1 - framingInfo.Top;
                     int bufferSize = Global.BufferSize(width, height, memoryFormat, fourChannel);
                     if (boundingWidth < width)
                     {
@@ -197,22 +173,20 @@ namespace PakonLib
                     }
                 }
             }
+            return new BoundingRectangleMetrics(boundingWidth, boundingHeight, bufferByteCount);
         }
 
         public void SaveToClientMemory(Scanner scanner, ScannerSettings scannerSettings, bool fourChannel)
         {
-            int boundingWidth;
-            int boundingHeight;
-            int bufferByteCount;
-            FindBoundingRectangle(scanner, out boundingWidth, out boundingHeight, out bufferByteCount, fourChannel);
-            if (bufferByteCount == 0)
+            BoundingRectangleMetrics boundingMetrics = FindBoundingRectangle(scanner, fourChannel);
+            if (boundingMetrics.BufferByteCount == 0)
             {
                 throw new ArgumentException("No pictures to save");
             }
             scanner.Unsafe.MemoryFormat = MemoryFormat;
-            scanner.Unsafe.Allocate(bufferByteCount);
+            scanner.Unsafe.Allocate(boundingMetrics.BufferByteCount);
             scanner.Unsafe.NextBuffer(scanner);
-            scanner.ISave.SaveToClientMemory(scannerSettings.Type, index, saveControl, boundingWidth, boundingHeight, scalingMethod, memoryFormat, fourChannel);
+            scanner.ISave.SaveToClientMemory(scannerSettings.Type, index, saveControl, boundingMetrics.Width, boundingMetrics.Height, scalingMethod, memoryFormat, fourChannel);
         }
     }
 

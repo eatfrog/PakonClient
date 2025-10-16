@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using PakonLib;
 using PakonLib.Enums;
+using PakonLib.Models;
 using System.Security.Principal;
 namespace ConsoleClient
 {
@@ -72,20 +73,12 @@ namespace ConsoleClient
 
 
                 Console.WriteLine("Get and clear last error");
-                string errorstring = String.Empty;
-                string errornr = string.Empty;
-                int retnr = 0;
-                scanner.GetAndClearLastErrorTLX(WorkerThreadOperation.InitializeProgress, ref errorstring, ref errornr, out retnr);
-                Console.WriteLine("{0} {1} {2}", errorstring, errornr, retnr);
+                var errorInfo = scanner.GetAndClearLastErrorTLX(WorkerThreadOperation.InitializeProgress);
+                Console.WriteLine("{0} {1} {2}", errorInfo.ErrorMessage, errorInfo.ErrorNumbers, errorInfo.ReturnValue);
 
-                var type = SCANNER_TYPE_000.SCANNER_TYPE_UNKNOWN;
-                int serial = 0;
-                var scannerhw1 = ScannerHW135.Unknown;
-                var scannerhw2 = ScannerHW235.Unknown;
-                var scannerhw3 = ScannerHW335.Unknown;
                 Console.WriteLine("Get scanner info");
-                scanner.IScan.GetScannerInfo000(ref type, ref serial, ref scannerhw1, ref scannerhw2, ref scannerhw3);
-                Console.WriteLine("{0} {1} {2} {3} {4}", type, serial, scannerhw1, scannerhw2, scannerhw3);
+                var scannerInfo = scanner.IScan.GetScannerInfo();
+                Console.WriteLine("{0} {1} {2} {3} {4}", scannerInfo.ScannerType, scannerInfo.ScannerSerialNumber, scannerInfo.Hardware135, scannerInfo.Hardware235, scannerInfo.Hardware335);
 
                 Console.WriteLine("Start scan");
                 _wtProgress = WORKER_THREAD_PROGRESS_000.WTP_Initialize;
@@ -139,31 +132,27 @@ namespace ConsoleClient
         private static void ClearErrors(Exception ex)
         {
             ERROR_CODES_000 errorCode;
-            string error = String.Empty;
-            string errornumbers = String.Empty;
-            int returnint = 0;
+            ScannerErrorInfo errorInfo;
             do
             {
-                scanner.GetAndClearLastErrorTLX(WorkerThreadOperation.TlxError, ref error, ref errornumbers, out returnint);
+                errorInfo = scanner.GetAndClearLastErrorTLX(WorkerThreadOperation.TlxError);
                 if (Enum.TryParse<ERROR_CODES_000>(ex.Message, out errorCode))
-                    Console.WriteLine(error);
+                    Console.WriteLine(errorInfo.ErrorMessage);
                 else
-                    Console.WriteLine($"TLX error - exception: {ex.Message} message: {error} num: {errornumbers} int: {returnint}");
-            } while (returnint == 25);
+                    Console.WriteLine($"TLX error - exception: {ex.Message} message: {errorInfo.ErrorMessage} num: {errorInfo.ErrorNumbers} int: {errorInfo.ReturnValue}");
+            } while (errorInfo.ReturnValue == 25);
         }
 
         private static void ClearErrors()
         {
             ERROR_CODES_000 errorCode;
-            string error = String.Empty;
-            string errornumbers = String.Empty;
-            int returnint = 0;
+            ScannerErrorInfo errorInfo;
             do
             {
-                scanner.GetAndClearLastErrorTLX(WorkerThreadOperation.TlxError, ref error, ref errornumbers, out returnint);
-                errorCode = (ERROR_CODES_000)returnint;
-                Console.WriteLine($"TLX error - message: {error} num: {errornumbers} int: {returnint}");
-            } while (returnint == 25);
+                errorInfo = scanner.GetAndClearLastErrorTLX(WorkerThreadOperation.TlxError);
+                errorCode = (ERROR_CODES_000)errorInfo.ReturnValue;
+                Console.WriteLine($"TLX error - message: {errorInfo.ErrorMessage} num: {errorInfo.ErrorNumbers} int: {errorInfo.ReturnValue}");
+            } while (errorInfo.ReturnValue == 25);
         }
 
         public static bool IsAdministrator()

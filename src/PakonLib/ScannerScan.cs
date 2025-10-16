@@ -1,6 +1,7 @@
 ﻿// Pakon.ScannerScan
 using TLXLib;
 using PakonLib.Enums;
+using PakonLib.Models;
 
 namespace PakonLib 
 {
@@ -56,11 +57,7 @@ namespace PakonLib
             tlx.AdvanceFilm(advanceMilliseconds, advanceSpeed);
         }
 
-        public void GetScannerInfo000(ref SCANNER_TYPE_000 scannerType,
-            ref int scannerSerialNumber,
-            ref ScannerHW135 hardware135,
-            ref ScannerHW235 hardware235,
-            ref ScannerHW335 hardware335)
+        public ScannerInfo GetScannerInfo()
         {
             int nativeScannerType = 0;
             int nativeScannerVersionHardware = 0;
@@ -73,8 +70,14 @@ namespace PakonLib
             string scannerModel = "";
             string tlaVersion = "";
             string tlxVersion = "";
+            int scannerSerialNumber = 0;
             tlx.GetScannerInfo000(ref nativeScannerType, ref romVersion, ref scannerModel, ref scannerSerialNumber, ref nativeScannerVersionHardware, ref tlaVersion, ref darkPointCorrectIntervalMinutes, ref colorPortraitMode, ref scanPacketReadyTimeout, ref noFilmTimeout, ref lampSaverSeconds, ref tlxVersion);
+            SCANNER_TYPE_000 scannerType;
+            ScannerHW135 hardware135;
+            ScannerHW235 hardware235;
+            ScannerHW335 hardware335;
             Global.Convert(nativeScannerType, nativeScannerVersionHardware, out scannerType, out hardware135, out hardware235, out hardware335);
+            return new ScannerInfo(scannerType, scannerSerialNumber, hardware135, hardware235, hardware335);
         }
     }
 
