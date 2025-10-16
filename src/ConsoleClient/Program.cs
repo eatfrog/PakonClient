@@ -12,6 +12,10 @@ using PakonLib.Models;
 using System.Security.Principal;
 namespace ConsoleClient
 {
+
+    // TODO: this sample creates some huge buffer files in c:\buffers - tlxclientdemo does not do this
+    // TODO: the executable must be run in the C:\Program Files (x86)\Pakon\F-X35 COM SERVER folder, otherwise it will fail
+    // I think it needs more of the dlls in that folder to work properly
     class Program
     {
         static WorkerThreadProgress _wtProgress = WorkerThreadProgress.Initialize;
@@ -72,10 +76,11 @@ namespace ConsoleClient
                 Console.WriteLine("Init done!");
 
 
-                Console.WriteLine("Get and clear last error");
-                var errorInfo = scanner.GetAndClearLastErrorTLX(WorkerThreadOperation.InitializeProgress);
-                Console.WriteLine("{0} {1} {2}", errorInfo.ErrorMessage, errorInfo.ErrorNumbers, errorInfo.ReturnValue);
-
+                var type = SCANNER_TYPE_000.SCANNER_TYPE_UNKNOWN;
+                int serial = 0;
+                var scannerhw1 = ScannerHW135.Unknown;
+                var scannerhw2 = ScannerHW235.Unknown;
+                var scannerhw3 = ScannerHW335.Unknown;
                 Console.WriteLine("Get scanner info");
                 var scannerInfo = scanner.IScan.GetScannerInfo();
                 Console.WriteLine("{0} {1} {2} {3} {4}", scannerInfo.ScannerType, scannerInfo.ScannerSerialNumber, scannerInfo.Hardware135, scannerInfo.Hardware235, scannerInfo.Hardware335);
@@ -95,8 +100,8 @@ namespace ConsoleClient
                 }
                 Console.WriteLine("Scan done");
 
-                Console.WriteLine("Move roll to save group");
-                scanner.ISave.MoveOldestRollToSaveGroup();
+                //Console.WriteLine("Move roll to save group");
+                //scanner.ISave.MoveOldestRollToSaveGroup();
 
                 Console.WriteLine("Saving to disk");
                 _wtProgress = WorkerThreadProgress.Initialize;
@@ -131,35 +136,26 @@ namespace ConsoleClient
 
         private static void ClearErrors(Exception ex)
         {
-            string error = String.Empty;
-            string errornumbers = String.Empty;
+
             int returnint = 0;
             do
             {
-                scanner.GetAndClearLastErrorTLX(WorkerThreadOperation.TlxError, ref error, ref errornumbers, out returnint);
-                var errorCode = ErrorCode.FromValue(returnint);
-                if (ErrorCode.TryParse(ex.Message, out var parsedFromMessage) && parsedFromMessage == errorCode)
-                {
-                    Console.WriteLine(error);
-                }
-                else
-                {
-                    Console.WriteLine($"TLX error - exception: {ex.Message} message: {error} num: {errornumbers} int: {errorCode.RawValue} ({errorCode})");
-                }
+                var errors = scanner.GetAndClearLastErrorTLX(WorkerThreadOperation.TlxError);
+                var errorCode = ErrorCode.FromValue(errors.ReturnValue);
+                Console.WriteLine($"TLX error - exception: {ex.Message} message: {errors.ErrorMessage} num: {errors.ErrorNumbers} int: {errorCode.RawValue} ({errorCode})");
             } while (returnint == 25);
         }
 
         private static void ClearErrors()
         {
-            string error = String.Empty;
-            string errornumbers = String.Empty;
-            int returnint = 0;
+            int ret = 0;
             do
             {
-                scanner.GetAndClearLastErrorTLX(WorkerThreadOperation.TlxError, ref error, ref errornumbers, out returnint);
-                var errorCode = ErrorCode.FromValue(returnint);
-                Console.WriteLine($"TLX error - message: {error} num: {errornumbers} int: {errorCode.RawValue} ({errorCode})");
-            } while (returnint == 25);
+                var errors = scanner.GetAndClearLastErrorTLX(WorkerThreadOperation.TlxError);
+                var errorCode = ErrorCode.FromValue(errors.ReturnValue);
+                Console.WriteLine($"TLX error - message: {errors.ErrorMessage} num: {errors.ErrorNumbers} int: {errorCode.RawValue} ({errorCode})");
+                ret = errors.ReturnValue;
+            } while (ret == 25);
         }
 
         public static bool IsAdministrator()

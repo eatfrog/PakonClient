@@ -55,6 +55,13 @@
     <Compile Include="Interfaces\ISavePictures.cs" />
     <Compile Include="Interfaces\ISavePictures3.cs" />
     <Compile Include="Interfaces\IScanPictures.cs" />
+    <Compile Include="Models\BoundingRectangleMetrics.cs" />
+    <Compile Include="Models\PictureCountSaveGroupResult.cs" />
+    <Compile Include="Models\PictureCountScanGroupResult.cs" />
+    <Compile Include="Models\PictureFramingInfo.cs" />
+    <Compile Include="Models\PictureInfo.cs" />
+    <Compile Include="Models\ScannerErrorInfo.cs" />
+    <Compile Include="Models\ScannerInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scanner.cs" />
     <Compile Include="Enums\ScannerCapabilities.cs" />
