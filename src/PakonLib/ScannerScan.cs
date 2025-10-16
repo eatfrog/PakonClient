@@ -72,11 +72,10 @@ namespace PakonLib
             string tlxVersion = "";
             int scannerSerialNumber = 0;
             tlx.GetScannerInfo000(ref nativeScannerType, ref romVersion, ref scannerModel, ref scannerSerialNumber, ref nativeScannerVersionHardware, ref tlaVersion, ref darkPointCorrectIntervalMinutes, ref colorPortraitMode, ref scanPacketReadyTimeout, ref noFilmTimeout, ref lampSaverSeconds, ref tlxVersion);
-            SCANNER_TYPE_000 scannerType;
             ScannerHW135 hardware135;
             ScannerHW235 hardware235;
             ScannerHW335 hardware335;
-            Global.Convert(nativeScannerType, nativeScannerVersionHardware, out scannerType, out hardware135, out hardware235, out hardware335);
+            Global.Convert(nativeScannerType, nativeScannerVersionHardware, out ScannerType scannerType, out hardware135, out hardware235, out hardware335);
             return new ScannerInfo(scannerType, scannerSerialNumber, hardware135, hardware235, hardware335);
         }
     }

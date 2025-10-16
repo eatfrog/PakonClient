@@ -2,12 +2,13 @@
 using System;
 using System.Runtime.InteropServices;
 using TLXLib;
+using PakonLib.Enums;
 
 namespace PakonLib 
 {
     public class ScannerUnsafe
     {
-        private FILE_FORMAT_SAVE_TO_MEMORY_000 memoryFormat;
+        private MemoryFileFormat memoryFormat;
 
         private bool usingFirstBuffer = true;
 
@@ -25,7 +26,7 @@ namespace PakonLib
 
         private int clientBufferAddress2 = 0;
 
-        public FILE_FORMAT_SAVE_TO_MEMORY_000 MemoryFormat
+        public MemoryFileFormat MemoryFormat
         {
             get
             {
@@ -106,11 +107,11 @@ namespace PakonLib
             {
                 byte* buffer = (usingFirstBuffer ? clientBuffer2 : clientBuffer1);
                 uint bytesToCopy = 0u;
-                switch (memoryFormat)
-                {
-                    case FILE_FORMAT_SAVE_TO_MEMORY_000.iFILE_FORMAT_SAVE_TO_MEMORY_PLANAR_16:
-                        {
-                            SiPlanarFileHeader* header = (SiPlanarFileHeader*)buffer;
+            switch (memoryFormat.NativeValue)
+            {
+                case FILE_FORMAT_SAVE_TO_MEMORY_000.iFILE_FORMAT_SAVE_TO_MEMORY_PLANAR_16:
+                    {
+                        SiPlanarFileHeader* header = (SiPlanarFileHeader*)buffer;
                             bytesToCopy = header->Width * header->Height * (header->BitCount / 8u) + (uint)sizeof(SiPlanarFileHeader);
                             break;
                         }

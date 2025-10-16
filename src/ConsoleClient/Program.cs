@@ -76,11 +76,6 @@ namespace ConsoleClient
                 Console.WriteLine("Init done!");
 
 
-                var type = SCANNER_TYPE_000.SCANNER_TYPE_UNKNOWN;
-                int serial = 0;
-                var scannerhw1 = ScannerHW135.Unknown;
-                var scannerhw2 = ScannerHW235.Unknown;
-                var scannerhw3 = ScannerHW335.Unknown;
                 Console.WriteLine("Get scanner info");
                 var scannerInfo = scanner.IScan.GetScannerInfo();
                 Console.WriteLine("{0} {1} {2} {3} {4}", scannerInfo.ScannerType, scannerInfo.ScannerSerialNumber, scannerInfo.Hardware135, scannerInfo.Hardware235, scannerInfo.Hardware335);
@@ -106,12 +101,12 @@ namespace ConsoleClient
                 Console.WriteLine("Saving to disk");
                 _wtProgress = WorkerThreadProgress.Initialize;
                 scanner.ISave.SaveToDisk(
-                    INDEX_000.INDEX_All,
-                    SAVE_CONTROL_000.SAV_SizeOriginal,
+                    PictureIndex.All,
+                    SaveControl.SizeOriginal,
                     0,
                     0,
-                    SCALING_METHOD_000.SCALING_METHOD_BICUBIC,
-                    FILE_FORMAT_000.iFILE_FORMAT_JPG,
+                    ScalingMethod.Bicubic,
+                    FileFormat.Jpeg,
                     90,
                     300,
                     24);
