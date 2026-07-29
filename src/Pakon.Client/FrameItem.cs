@@ -9,7 +9,7 @@ public sealed class FrameItem : INotifyPropertyChanged
     private bool isIncluded = true;
     private bool isSelected;
     private int rotation;
-    private double brightness;
+    private double exposure;
     private double contrast;
     private double redBalance;
     private double greenBalance;
@@ -27,7 +27,7 @@ public sealed class FrameItem : INotifyPropertyChanged
     public bool IsIncluded { get => isIncluded; set => Set(ref isIncluded, value); }
     public bool IsSelected { get => isSelected; set => Set(ref isSelected, value); }
     public int Rotation { get => rotation; set => Set(ref rotation, ((value % 360) + 360) % 360); }
-    public double Brightness { get => brightness; set => Set(ref brightness, value); }
+    public double Exposure { get => exposure; set => Set(ref exposure, value); }
     public double Contrast { get => contrast; set => Set(ref contrast, value); }
     public double RedBalance { get => redBalance; set => Set(ref redBalance, value); }
     public double GreenBalance { get => greenBalance; set => Set(ref greenBalance, value); }

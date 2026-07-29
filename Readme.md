@@ -35,6 +35,13 @@ temporary TLX use is isolated in `Pakon.LegacyBridge`, an x86 process reached
 through named pipes. The new application does not expose TLX types in its
 public API.
 
+The application-facing scanner boundary is defined in `Pakon.Scanner`.
+`Pakon.Scanner.Legacy` implements that contract through the existing bridge
+and is the only scanner-workflow project that knows TLX operation values or
+save-control flags. `Pakon.Client` selects one workflow backend for the whole
+scanner session, allowing a managed F-135 backend to be introduced beside the
+legacy implementation without changing the UI workflow.
+
 ## Project history and acknowledgements
 
 This project began by preserving and studying the existing Pakon software

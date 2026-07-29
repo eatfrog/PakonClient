@@ -1,6 +1,6 @@
 using Microsoft.Win32;
-using Pakon.LegacyBridge.Client;
-using Pakon.LegacyBridge.Protocol;
+using Pakon.Client.Scanning;
+using Pakon.Scanner;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -15,15 +15,7 @@ namespace Pakon.Client;
 
 public partial class MainWindow : Window
 {
-    private enum FilmKind
-    {
-        ColorNegative,
-        ColorPositive,
-        BlackAndWhite
-    }
-
-    private readonly LegacyBridgeClient bridge = new();
-    private readonly BridgeProcessHost bridgeHost = new();
+    private readonly IScannerWorkflow scannerWorkflow = ScannerWorkflowFactory.CreateDefault();
     private readonly ObservableCollection<FrameItem> frames = [];
     private readonly DispatcherTimer adjustmentTimer;
     private readonly string sessionDirectory = Path.Combine(Path.GetTempPath(), "Pakon", Guid.NewGuid().ToString("N"));
@@ -40,7 +32,7 @@ public partial class MainWindow : Window
     private bool IsPositiveSlide => ColorPositiveRadio.IsChecked == true;
     private bool ActiveBlackAndWhite => activeFilmKind == FilmKind.BlackAndWhite;
     private bool ActiveColorNegative => activeFilmKind == FilmKind.ColorNegative;
-    // TLX's C-41 color-processing flags already produce a positive image for color
+    // The scanner pipeline already produces a positive image for color
     // negatives. Only B&W negative output still needs software inversion.
     private bool ActiveRequiresSoftwareInversion => activeFilmKind == FilmKind.BlackAndWhite;
     private int PageCount => Math.Max(1, (frames.Count + 8) / 9);
@@ -69,10 +61,10 @@ public partial class MainWindow : Window
             try
             {
                 using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
-                await bridge.CloseTlxSessionAsync(timeout.Token);
+                await scannerWorkflow.CloseAsync(timeout.Token);
             }
             catch { }
-            bridgeHost.Dispose();
+            scannerWorkflow.Dispose();
             try { Directory.Delete(sessionDirectory, true); } catch { }
             Close();
         };
@@ -88,12 +80,12 @@ public partial class MainWindow : Window
         SetConnection("Initializing scanner…", "#C59134");
         try
         {
-            BridgeResponse? status = null;
-            using (var existingBridgeTimeout = new CancellationTokenSource(TimeSpan.FromMilliseconds(800)))
+            ScannerStatus? status = null;
+            using (var existingBackendTimeout = new CancellationTokenSource(TimeSpan.FromMilliseconds(800)))
             {
                 try
                 {
-                    status = await RequireSuccess(bridge.GetTlxSessionStatusAsync(existingBridgeTimeout.Token));
+                    status = await scannerWorkflow.GetStatusAsync(existingBackendTimeout.Token);
                 }
                 catch (OperationCanceledException) { }
                 catch (IOException) { }
@@ -101,33 +93,44 @@ public partial class MainWindow : Window
 
             if (status == null)
             {
-                bridgeHost.EnsureStarted();
+                scannerWorkflow.EnsureAvailable();
                 await Task.Delay(450);
-                status = await RequireSuccess(bridge.GetTlxSessionStatusAsync());
+                status = await scannerWorkflow.GetStatusAsync();
             }
 
-            var state = status.Values.GetValueOrDefault("state", "Closed");
-            if (state is "Faulted" or "Scanning" or "CancellingScan")
+            var state = status.State;
+            if (state is ScannerState.Faulted or ScannerState.Capturing or ScannerState.CancellingCapture)
             {
                 await RecoverFromInterruptedScanAsync();
                 if (scannerReady) return;
                 throw new InvalidOperationException("The previous scan did not release the scanner.");
             }
 
-            if (state == "Closed")
-                await RequireSuccess(bridge.InitializeTlxSessionAsync());
+            if (state == ScannerState.Closed)
+                await scannerWorkflow.InitializeAsync();
             await PollUntilReadyAsync("Initializing scanner", CancellationToken.None, TimeSpan.FromMinutes(4));
             scannerReady = true;
             StartScanButton.IsEnabled = true;
             SetConnection("Scanner ready", "#2D7356");
             ShowPage(SetupPage);
         }
+        catch (ScannerPrerequisiteException ex)
+        {
+            scannerReady = false;
+            SetConnection("Pakon installation incomplete", "#B44131");
+            ShowPage(SetupPage);
+            MessageBox.Show(
+                ex.Message,
+                "Pakon software installation incomplete",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
         catch (Exception ex)
         {
             scannerReady = false;
             SetConnection("Scanner unavailable", "#B44131");
             ShowPage(SetupPage);
-            var retry = MessageBox.Show($"{ex.Message}\n\nCheck power, USB, and the 32-bit Pakon runtime, then choose Retry.",
+            var retry = MessageBox.Show($"{ex.Message}\n\nCheck scanner power and USB, then choose Retry.",
                 "Scanner initialization failed", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (retry == MessageBoxResult.Yes) await InitializeScannerAsync();
         }
@@ -149,16 +152,11 @@ public partial class MainWindow : Window
         operationCancellation = new CancellationTokenSource();
         try
         {
-            var filmColor = ActiveColorNegative
-                ? 1
-                : activeFilmKind == FilmKind.ColorPositive
-                    ? 2
-                    : IceCheckBox.IsChecked == true ? 8 : 4;
-            var scanControl = IceCheckBox.IsChecked == true ? 0x08 : 0;
-            await RequireSuccess(bridge.ScanRollAsync(2, filmColor, 1, 0, scanControl, operationCancellation.Token));
+            await scannerWorkflow.BeginCaptureAsync(
+                new CaptureRequest(activeFilmKind, IceCheckBox.IsChecked == true),
+                operationCancellation.Token);
             await PollUntilReadyAsync("Scanning roll", operationCancellation.Token, TimeSpan.FromMinutes(20));
             ScanStatusText.Text = "Preparing previews…";
-            await RequireSuccess(bridge.MoveOldestRollToSaveGroupAsync(operationCancellation.Token));
             await LoadFramesAndPreviewsAsync(operationCancellation.Token);
             ShowReviewPage();
         }
@@ -208,14 +206,14 @@ public partial class MainWindow : Window
 
         try
         {
-            var status = await GetBridgeStatusWithTimeoutAsync();
-            var state = status.Values.GetValueOrDefault("state", "Unknown");
-            if (state != "Ready")
+            var status = await GetScannerStatusWithTimeoutAsync();
+            var state = status.State;
+            if (state != ScannerState.Ready)
             {
                 try
                 {
                     using var cancelTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
-                    await bridge.CancelScanAsync(cancelTimeout.Token);
+                    await scannerWorkflow.CancelCaptureAsync(cancelTimeout.Token);
                 }
                 catch { }
             }
@@ -223,9 +221,9 @@ public partial class MainWindow : Window
             var started = Stopwatch.StartNew();
             while (started.Elapsed < TimeSpan.FromSeconds(20))
             {
-                status = await GetBridgeStatusWithTimeoutAsync();
-                state = status.Values.GetValueOrDefault("state", "Unknown");
-                if (state == "Ready")
+                status = await GetScannerStatusWithTimeoutAsync();
+                state = status.State;
+                if (state == ScannerState.Ready)
                 {
                     scannerReady = true;
                     StartScanButton.IsEnabled = true;
@@ -235,13 +233,13 @@ public partial class MainWindow : Window
                 await Task.Delay(300);
             }
 
-            await RestartBridgeAndScannerAsync();
+            await RestartScannerAsync();
         }
         catch
         {
             try
             {
-                await RestartBridgeAndScannerAsync();
+                await RestartScannerAsync();
             }
             catch
             {
@@ -252,52 +250,52 @@ public partial class MainWindow : Window
         }
     }
 
-    private async Task<BridgeResponse> GetBridgeStatusWithTimeoutAsync()
+    private async Task<ScannerStatus> GetScannerStatusWithTimeoutAsync()
     {
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
-        return await RequireSuccess(bridge.GetTlxSessionStatusAsync(timeout.Token));
+        return await scannerWorkflow.GetStatusAsync(timeout.Token);
     }
 
-    private async Task RestartBridgeAndScannerAsync()
+    private async Task RestartScannerAsync()
     {
-        SetConnection("Restarting scanner bridge…", "#C59134");
-        bridgeHost.RestartOwnedOrStart();
+        SetConnection("Restarting scanner connection…", "#C59134");
+        scannerWorkflow.Restart();
         await Task.Delay(600);
 
-        var status = await GetBridgeStatusWithTimeoutAsync();
-        var state = status.Values.GetValueOrDefault("state", "Closed");
-        if (state != "Closed")
+        var status = await GetScannerStatusWithTimeoutAsync();
+        var state = status.State;
+        if (state != ScannerState.Closed)
         {
             using var closeTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(4));
-            await RequireSuccess(bridge.CloseTlxSessionAsync(closeTimeout.Token));
+            await scannerWorkflow.CloseAsync(closeTimeout.Token);
         }
 
         using (var initializeTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(4)))
         {
-            await RequireSuccess(bridge.InitializeTlxSessionAsync(cancellationToken: initializeTimeout.Token));
+            await scannerWorkflow.InitializeAsync(initializeTimeout.Token);
         }
 
         var started = Stopwatch.StartNew();
         while (started.Elapsed < TimeSpan.FromSeconds(65))
         {
-            status = await GetBridgeStatusWithTimeoutAsync();
-            state = status.Values.GetValueOrDefault("state", "Unknown");
-            if (state == "Ready")
+            status = await GetScannerStatusWithTimeoutAsync();
+            state = status.State;
+            if (state == ScannerState.Ready)
             {
                 scannerReady = true;
                 StartScanButton.IsEnabled = true;
                 SetConnection("Scanner ready", "#2D7356");
                 return;
             }
-            if (state == "Faulted")
+            if (state == ScannerState.Faulted)
             {
                 throw new InvalidOperationException(
-                    status.Values.GetValueOrDefault("failure", "Scanner initialization failed."));
+                    status.Failure ?? "Scanner initialization failed.");
             }
             await Task.Delay(350);
         }
 
-        throw new TimeoutException("The scanner bridge did not become ready after restarting.");
+        throw new TimeoutException("The scanner did not become ready after restarting.");
     }
 
     private static bool IsFilmTailFirstError(string message) =>
@@ -307,21 +305,30 @@ public partial class MainWindow : Window
     private async Task LoadFramesAndPreviewsAsync(CancellationToken cancellationToken)
     {
         frames.Clear();
-        var response = await RequireSuccess(bridge.GetFramesAsync(cancellationToken));
-        var count = int.Parse(response.Values["count"], CultureInfo.InvariantCulture);
-        for (var index = 0; index < count; index++)
+        var capturedFrames = await scannerWorkflow.CompleteCaptureAsync(cancellationToken);
+        for (var index = 0; index < capturedFrames.Count; index++)
         {
-            var key = $"frame.{index}.";
-            var frameNumber = ParseInt(response.Values, key + "frameNumber", index + 1);
-            var frameName = response.Values.GetValueOrDefault(key + "frameName", string.Empty);
+            var capturedFrame = capturedFrames[index];
+            var frameNumber = capturedFrame.FrameNumber;
+            var frameName = capturedFrame.FrameName;
             var sourcePath = Path.Combine(sessionDirectory, $"preview-source-{index:000}.jpg");
-            var render = await RequireSuccess(bridge.RenderFrameToDiskAsync(
-                index, sourcePath, NativeSaveControl(includeLowResolution: true), 900, 620, 95, cancellationToken));
-            await PollUntilReadyAsync($"Preparing preview {index + 1} of {count}", cancellationToken, TimeSpan.FromMinutes(3));
-            sourcePath = render.Values["outputPath"];
+            var render = await scannerWorkflow.RenderFrameAsync(
+                new FrameRenderRequest(
+                    capturedFrame.Index,
+                    sourcePath,
+                    FrameRenderFormat.Jpeg,
+                    activeFilmKind,
+                    IceCheckBox.IsChecked == true,
+                    LowResolution: true,
+                    Width: 900,
+                    Height: 620,
+                    JpegQuality: 95),
+                cancellationToken);
+            await PollUntilReadyAsync($"Preparing preview {index + 1} of {capturedFrames.Count}", cancellationToken, TimeSpan.FromMinutes(3));
+            sourcePath = render.OutputPath;
             var frame = new FrameItem
             {
-                Index = index,
+                Index = capturedFrame.Index,
                 FrameNumber = frameNumber <= 0 ? index + 1 : frameNumber,
                 FrameName = frameName,
                 SourcePath = sourcePath
@@ -350,29 +357,29 @@ public partial class MainWindow : Window
         while (started.Elapsed < timeout)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var response = await RequireSuccess(bridge.GetTlxSessionStatusAsync(cancellationToken));
-            var state = response.Values.GetValueOrDefault("state", "Unknown");
-            var meaning = response.Values.GetValueOrDefault("lastStatusMeaning", string.Empty);
+            var status = await scannerWorkflow.GetStatusAsync(cancellationToken);
+            var state = status.State;
+            var meaning = status.ProgressMeaning;
             Dispatcher.Invoke(() =>
             {
                 ScanStatusText.Text = string.IsNullOrWhiteSpace(meaning) ? $"{activity}…" : $"{activity} · {meaning}";
                 FooterText.Text = $"{activity} · {started.Elapsed:mm\\:ss}";
-                if (int.TryParse(response.Values.GetValueOrDefault("lastStatus"), out var progress) && progress is > 0 and <= 100)
+                if (status.Progress is > 0 and <= 100)
                 {
                     ScanProgress.IsIndeterminate = false;
-                    ScanProgress.Value = progress;
+                    ScanProgress.Value = status.Progress.Value;
                 }
                 else
                 {
                     ScanProgress.IsIndeterminate = true;
                 }
             });
-            if (state == "Ready") return;
-            if (state == "Faulted")
+            if (state == ScannerState.Ready) return;
+            if (state == ScannerState.Faulted)
             {
-                var failure = response.Values.GetValueOrDefault("failure");
+                var failure = status.Failure;
                 throw new InvalidOperationException(string.IsNullOrWhiteSpace(failure)
-                    ? "The Pakon scanner reported an error. Check the bridge console for native error details."
+                    ? "The Pakon scanner reported an error. Check the scanner diagnostics for details."
                     : failure);
             }
             await Task.Delay(300, cancellationToken);
@@ -412,7 +419,7 @@ public partial class MainWindow : Window
             SelectedFrames.Skip(1).Any() ? $"{SelectedFrames.Count()} frames selected" : first.DisplayName;
         if (first == null) return;
         updatingSliders = true;
-        BrightnessSlider.Value = first.Brightness;
+        ExposureSlider.Value = first.Exposure;
         ContrastSlider.Value = first.Contrast;
         var colorDirection = ActiveColorNegative ? -1 : 1;
         RedSlider.Value = first.RedBalance * colorDirection;
@@ -426,7 +433,7 @@ public partial class MainWindow : Window
         if (updatingSliders || !IsLoaded) return;
         foreach (var frame in SelectedFrames)
         {
-            frame.Brightness = BrightnessSlider.Value;
+            frame.Exposure = ExposureSlider.Value;
             frame.Contrast = ContrastSlider.Value;
             if (!ActiveBlackAndWhite)
             {
@@ -482,7 +489,7 @@ public partial class MainWindow : Window
     {
         foreach (var frame in SelectedFrames)
         {
-            frame.Brightness = frame.Contrast = frame.RedBalance = frame.GreenBalance = frame.BlueBalance = 0;
+            frame.Exposure = frame.Contrast = frame.RedBalance = frame.GreenBalance = frame.BlueBalance = 0;
             frame.Rotation = 0;
         }
         SyncSlidersFromSelection();
@@ -559,8 +566,8 @@ public partial class MainWindow : Window
         ScanProgress.IsIndeterminate = true;
         try
         {
-            await RequireSuccess(bridge.CloseTlxSessionAsync());
-            await RequireSuccess(bridge.InitializeTlxSessionAsync());
+            await scannerWorkflow.CloseAsync();
+            await scannerWorkflow.InitializeAsync();
             await PollUntilReadyAsync("Initializing scanner", CancellationToken.None, TimeSpan.FromMinutes(4));
             frames.Clear();
             page = 0;
@@ -634,15 +641,20 @@ public partial class MainWindow : Window
     private async Task SavePng16Async(FrameItem frame, string outputPath)
     {
         var rawPath = Path.Combine(sessionDirectory, $"frame-{frame.Index:000}.raw");
-        await RequireSuccess(bridge.RenderFrameToRawAsync(frame.Index, rawPath, NativeSaveControl(false) & ~0x04));
+        await scannerWorkflow.RenderFrameAsync(new FrameRenderRequest(
+            frame.Index,
+            rawPath,
+            FrameRenderFormat.Planar16,
+            activeFilmKind,
+            IceCheckBox.IsChecked == true));
         await PollUntilReadyAsync($"Rendering {frame.DisplayName}", CancellationToken.None, TimeSpan.FromMinutes(5));
-        var converter = BridgeProcessHost.FindRawConverter();
+        var converter = RawConverterLocator.Find();
         var args = new List<string>
         {
             converter, "--input", rawPath, "--output", outputPath, "--format", "png",
             "--gamma", "0.4545454545454545",
-            "--contrast", Factor(frame.Contrast), "--saturation", "1",
-            "--brightness", Factor(frame.Brightness),
+            "--contrast", "1", "--saturation", "1", "--brightness", "1",
+            "--exposure", Number(frame.Exposure), "--contrast-adjustment", Number(frame.Contrast),
             "--red-balance", Factor(frame.RedBalance), "--green-balance", Factor(frame.GreenBalance),
             "--blue-balance", Factor(frame.BlueBalance), "--rotation", frame.Rotation.ToString(CultureInfo.InvariantCulture)
         };
@@ -665,25 +677,26 @@ public partial class MainWindow : Window
     private async Task SaveJpegAsync(FrameItem frame, string outputPath)
     {
         var sourceRequest = Path.Combine(sessionDirectory, $"full-source-{frame.Index:000}.jpg");
-        var render = await RequireSuccess(bridge.RenderFrameToDiskAsync(frame.Index, sourceRequest, NativeSaveControl(false) & ~0x04, 0, 0, 100));
+        var render = await scannerWorkflow.RenderFrameAsync(new FrameRenderRequest(
+            frame.Index,
+            sourceRequest,
+            FrameRenderFormat.Jpeg,
+            activeFilmKind,
+            IceCheckBox.IsChecked == true,
+            ApplyStoredRotation: false,
+            JpegQuality: 100));
         await PollUntilReadyAsync($"Rendering {frame.DisplayName}", CancellationToken.None, TimeSpan.FromMinutes(5));
         await ImageAdjustmentService.SaveJpegAsync(
-            render.Values["outputPath"],
+            render.OutputPath,
             outputPath,
             frame,
             ActiveRequiresSoftwareInversion,
             ActiveBlackAndWhite);
     }
 
-    private int NativeSaveControl(bool includeLowResolution)
-    {
-        var value = ActiveColorNegative ? 0x74 : 0x04;
-        if (IceCheckBox.IsChecked == true) value |= 0x80;
-        if (includeLowResolution) value |= 0x08;
-        return value;
-    }
-
     private static string Factor(double percent) => (1 + percent / 100d).ToString("0.####", CultureInfo.InvariantCulture);
+
+    private static string Number(double value) => value.ToString("0.####", CultureInfo.InvariantCulture);
 
     private static string BuildOutputStem(string prefix, FrameItem frame, int sequence)
     {
@@ -785,13 +798,4 @@ public partial class MainWindow : Window
         try { settings.Save(); } catch { }
     }
 
-    private static int ParseInt(IReadOnlyDictionary<string, string> values, string key, int fallback) =>
-        values.TryGetValue(key, out var value) && int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed) ? parsed : fallback;
-
-    private static async Task<BridgeResponse> RequireSuccess(Task<BridgeResponse> request)
-    {
-        var response = await request;
-        if (!response.Succeeded) throw new InvalidOperationException(response.Error ?? "The scanner bridge rejected the request.");
-        return response;
-    }
 }

@@ -750,8 +750,28 @@ namespace Pakon.LegacyBridge
         {
             var directory = string.IsNullOrWhiteSpace(overrideDirectory) ? ReadRegisteredTlxDirectory() : Path.GetFullPath(overrideDirectory);
             if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory)) throw new DirectoryNotFoundException("Could not find the Pakon F-X35 COM SERVER directory. Supply comServerDirectory when initializing the TLX session.");
+            AddNativeRuntimeDirectoriesToPath(directory);
             if (!SetDllDirectory(directory)) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error(), "SetDllDirectory failed for '" + directory + "'.");
             Environment.CurrentDirectory = directory;
+        }
+
+        private static void AddNativeRuntimeDirectoriesToPath(string comServerDirectory)
+        {
+            var pakonDirectory = Directory.GetParent(comServerDirectory);
+            var currentPath = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
+            var directories = new[] { AppContext.BaseDirectory, pakonDirectory == null ? null : pakonDirectory.FullName };
+
+            for (var index = directories.Length - 1; index >= 0; index--)
+            {
+                var candidate = directories[index];
+                if (string.IsNullOrWhiteSpace(candidate) || !Directory.Exists(candidate)) continue;
+
+                var entries = currentPath.Split(new[] { Path.PathSeparator }, StringSplitOptions.RemoveEmptyEntries);
+                if (Array.Exists(entries, entry => string.Equals(entry.Trim(), candidate, StringComparison.OrdinalIgnoreCase))) continue;
+                currentPath = candidate + Path.PathSeparator + currentPath;
+            }
+
+            Environment.SetEnvironmentVariable("PATH", currentPath);
         }
 
         private static string ReadRegisteredTlxDirectory()

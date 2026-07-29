@@ -10,9 +10,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Pakon.LegacyBridge.Client\Pakon.LegacyBridge.Client.csproj" />
-    <ProjectReference Include="..\Pakon.LegacyBridge\Pakon.LegacyBridge.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\Legacy\RawImageConverterCli\RawImageConverterCli.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Pakon.Scanner\Pakon.Scanner.csproj" />
+    <ProjectReference Include="..\Pakon.Scanner.Legacy\Pakon.Scanner.Legacy.csproj" />
+    <ProjectReference Include="..\Pakon.RawImageConverter\Pakon.RawImageConverter.csproj" ReferenceOutputAssembly="false" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Legacy\ConsoleClient\lib\msvcp71.dll" Link="msvcp71.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="..\Legacy\ConsoleClient\lib\msvcr71.dll" Link="msvcr71.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 </Project>

@@ -177,8 +177,9 @@
                             <Button Content="Include" Style="{StaticResource SecondaryButton}" Padding="10,7" Margin="0,0,5,0" Click="IncludeSelectedClicked"/>
                             <Button Content="Exclude" Style="{StaticResource SecondaryButton}" Padding="10,7" Margin="5,0,0,0" Click="ExcludeSelectedClicked"/>
                         </UniformGrid>
-                        <TextBlock Text="Brightness" FontWeight="SemiBold"/>
-                        <Slider x:Name="BrightnessSlider" Minimum="-50" Maximum="50" ValueChanged="AdjustmentChanged"/>
+                        <TextBlock Text="Exposure (stops)" FontWeight="SemiBold"/>
+                        <Slider x:Name="ExposureSlider" Minimum="-2" Maximum="2"
+                                SmallChange="0.1" LargeChange="0.5" ValueChanged="AdjustmentChanged"/>
                         <TextBlock Text="Contrast" FontWeight="SemiBold"/>
                         <Slider x:Name="ContrastSlider" Minimum="-50" Maximum="50" ValueChanged="AdjustmentChanged"/>
                         <StackPanel x:Name="ColorBalancePanel">

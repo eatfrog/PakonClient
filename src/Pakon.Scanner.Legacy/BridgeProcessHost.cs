@@ -1,7 +1,6 @@
 using System.Diagnostics;
-using System.IO;
 
-namespace Pakon.Client;
+namespace Pakon.Scanner.Legacy;
 
 internal sealed class BridgeProcessHost : IDisposable
 {
@@ -36,18 +35,6 @@ internal sealed class BridgeProcessHost : IDisposable
         process?.Dispose();
         process = null;
         EnsureStarted();
-    }
-
-    public static string FindRawConverter()
-    {
-        var candidates = CandidateRoots().SelectMany(root => new[]
-        {
-            Path.Combine(root, "src", "Legacy", "RawImageConverterCli", "bin", "Debug", "net10.0", "RawImageConverterCli.dll"),
-            Path.Combine(root, "src", "Legacy", "RawImageConverterCli", "bin", "Release", "net10.0", "RawImageConverterCli.dll"),
-            Path.Combine(AppContext.BaseDirectory, "RawImageConverterCli.dll")
-        });
-        return candidates.FirstOrDefault(File.Exists)
-            ?? throw new FileNotFoundException("RawImageConverterCli.dll was not found. Build Pakon.sln first.");
     }
 
     private static string FindBridge()

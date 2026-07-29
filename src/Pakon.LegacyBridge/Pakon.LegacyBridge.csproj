@@ -16,4 +16,15 @@
       <Private>true</Private>
     </Reference>
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Legacy\ConsoleClient\lib\msvcp71.dll" Link="msvcp71.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="..\Legacy\ConsoleClient\lib\msvcr71.dll" Link="msvcr71.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

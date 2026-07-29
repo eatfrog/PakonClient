@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Pakon.Scanner\Pakon.Scanner.csproj" />
+    <ProjectReference Include="..\Pakon.LegacyBridge.Client\Pakon.LegacyBridge.Client.csproj" />
+    <ProjectReference Include="..\Pakon.LegacyBridge\Pakon.LegacyBridge.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+</Project>

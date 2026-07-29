@@ -66,8 +66,7 @@ internal static class ImageAdjustmentService
             image.Mutate(x => x.Grayscale());
         }
 
-        image.Mutate(x => x.Brightness((float)(1 + frame.Brightness / 100d)));
-        image.Mutate(x => x.Contrast((float)(1 + frame.Contrast / 100d)));
+        ApplyToneAdjustments(image, frame.Exposure, frame.Contrast);
 
         if (!blackAndWhite)
         {
@@ -90,6 +89,43 @@ internal static class ImageAdjustmentService
             });
         }
         if (frame.Rotation != 0) image.Mutate(x => x.Rotate(frame.Rotation));
+    }
+
+    private static void ApplyToneAdjustments(Image<Rgb24> image, double exposureStops, double contrastAdjustment)
+    {
+        var exposureFactor = Math.Pow(2, Math.Clamp(exposureStops, -4, 4));
+        var contrastExponent = Math.Pow(2, -Math.Clamp(contrastAdjustment, -100, 100) / 100d);
+
+        image.ProcessPixelRows(accessor =>
+        {
+            for (var y = 0; y < accessor.Height; y++)
+            {
+                var row = accessor.GetRowSpan(y);
+                for (var x = 0; x < row.Length; x++)
+                {
+                    ref var pixel = ref row[x];
+                    pixel.R = AdjustChannel(pixel.R, exposureFactor, contrastExponent);
+                    pixel.G = AdjustChannel(pixel.G, exposureFactor, contrastExponent);
+                    pixel.B = AdjustChannel(pixel.B, exposureFactor, contrastExponent);
+                }
+            }
+        });
+    }
+
+    private static byte AdjustChannel(byte value, double exposureFactor, double contrastExponent)
+    {
+        var encoded = value / 255d;
+        var linear = encoded <= 0.04045
+            ? encoded / 12.92
+            : Math.Pow((encoded + 0.055) / 1.055, 2.4);
+        linear = Math.Clamp(linear * exposureFactor, 0, 1);
+        encoded = linear <= 0.0031308
+            ? linear * 12.92
+            : 1.055 * Math.Pow(linear, 1 / 2.4) - 0.055;
+
+        var distance = Math.Abs(encoded - 0.5) * 2;
+        var curved = 0.5 + Math.Sign(encoded - 0.5) * 0.5 * Math.Pow(distance, contrastExponent);
+        return (byte)Math.Clamp(Math.Round(curved * 255), 0, 255);
     }
 
     private static void ApplyAutoLevels(Image<Rgb24> image)
