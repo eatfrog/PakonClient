@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0 — 2026-07-30
+
+### 16-bit image export
+
+- Corrected the 16-bit PNG conversion so it no longer applies an additional
+  display gamma curve that made exported images appear washed out.
+- Added an export-format notice explaining that 16-bit PNG files use raw
+  scanner data without Pakon's internal color adjustments, so their color and
+  tone may not exactly match the processed preview.
+- Kept quality-95 JPEG export aligned with the internally color-adjusted
+  preview workflow.
+
 ## 0.2.0 — 2026-07-29
 
 ### Installation and startup

@@ -224,10 +224,16 @@
                     <TextBox x:Name="PrefixTextBox" Height="39" Padding="10,8" VerticalContentAlignment="Center"/>
                     <TextBlock Text="DX frame names are used when available; otherwise frames are numbered in order."
                                Foreground="{StaticResource MutedBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,18"/>
-                    <RadioButton x:Name="Png16Radio" GroupName="Format" IsChecked="True">
+                    <RadioButton x:Name="Png16Radio" GroupName="Format" IsChecked="True"
+                                 Checked="ExportFormatChanged">
                         <StackPanel><TextBlock Text="16-bit PNG" FontWeight="SemiBold"/><TextBlock Text="Maximum editable quality" FontSize="11" Foreground="{StaticResource MutedBrush}"/></StackPanel>
                     </RadioButton>
-                    <RadioButton x:Name="JpegRadio" GroupName="Format">
+                    <TextBlock x:Name="Png16ColorNotice"
+                               Text="16-bit export uses raw scanner data without Pakon's internal color adjustments. Color and tone may not exactly match the preview."
+                               Foreground="#C59134" FontSize="11" TextWrapping="Wrap"
+                               Margin="24,6,0,10"/>
+                    <RadioButton x:Name="JpegRadio" GroupName="Format"
+                                 Checked="ExportFormatChanged">
                         <StackPanel><TextBlock Text="8-bit JPEG · quality 95" FontWeight="SemiBold"/><TextBlock Text="Smaller, ready to share" FontSize="11" Foreground="{StaticResource MutedBrush}"/></StackPanel>
                     </RadioButton>
                     <Button x:Name="SaveButton" Content="Save selected frames" Background="{StaticResource AccentBrush}"

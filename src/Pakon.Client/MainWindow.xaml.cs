@@ -544,6 +544,14 @@ public partial class MainWindow : Window
         if (dialog.ShowDialog() == true) OutputFolderTextBox.Text = dialog.FolderName;
     }
 
+    private void ExportFormatChanged(object sender, RoutedEventArgs e)
+    {
+        if (Png16ColorNotice == null || Png16Radio == null) return;
+        Png16ColorNotice.Visibility = Png16Radio.IsChecked == true
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+    }
+
     private void OpenOutputFolderClicked(object sender, RoutedEventArgs e)
     {
         var directory = OutputFolderTextBox.Text.Trim();
@@ -652,7 +660,10 @@ public partial class MainWindow : Window
         var args = new List<string>
         {
             converter, "--input", rawPath, "--output", outputPath, "--format", "png",
-            "--gamma", "0.4545454545454545",
+            // The scanner's rendered planar data already has its display tone curve.
+            // Applying another 1/2.2 gamma here makes the PNG much brighter than
+            // the scanner-rendered JPEG used by the preview.
+            "--gamma", "1",
             "--contrast", "1", "--saturation", "1", "--brightness", "1",
             "--exposure", Number(frame.Exposure), "--contrast-adjustment", Number(frame.Contrast),
             "--red-balance", Factor(frame.RedBalance), "--green-balance", Factor(frame.GreenBalance),
