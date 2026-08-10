@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media.Imaging;
+using Pakon.Scanner;
 
 namespace Pakon.Client;
 
@@ -17,9 +18,11 @@ public sealed class FrameItem : INotifyPropertyChanged
     private BitmapImage? preview;
 
     public required int Index { get; init; }
+    public required int StripIndex { get; init; }
     public required int FrameNumber { get; init; }
     public required string FrameName { get; init; }
     public required string SourcePath { get; set; }
+    public required FrameFraming Framing { get; set; }
     public bool HasUsableDxName =>
         !string.IsNullOrWhiteSpace(FrameName) &&
         !string.Equals(FrameName.Trim(), "DX_ERROR", StringComparison.OrdinalIgnoreCase);

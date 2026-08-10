@@ -17,6 +17,10 @@ namespace Pakon.LegacyBridge.Protocol
         public const string SaveFramesToDisk = "save-frames-to-disk";
         public const string GetFrames = "get-frames";
         public const string UpdateFrame = "update-frame";
+        public const string UpdateFrameFraming = "update-frame-framing";
+        public const string ConfigureFrameLayout = "configure-frame-layout";
+        public const string InsertFrame = "insert-frame";
+        public const string DeleteFrame = "delete-frame";
         public const string RenderFrameToDisk = "render-frame-to-disk";
         public const string RenderFrameToRaw = "render-frame-to-raw";
         public const string CancelScan = "cancel-scan";

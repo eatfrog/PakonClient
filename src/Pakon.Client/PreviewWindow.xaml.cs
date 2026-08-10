@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using Pakon.Scanner;
 
 namespace Pakon.Client;
 
@@ -8,14 +9,24 @@ public partial class PreviewWindow : Window
 {
     private readonly IReadOnlyList<FrameItem> frames;
     private readonly Func<FrameItem, Task> refreshPreview;
+    private readonly Func<FrameItem, FrameBounds, Task> applyFraming;
+    private readonly Func<Exception, Task<bool>> recoverIfScannerFaulted;
     private int index;
     private double zoom = 1;
+    private bool framingBusy;
 
-    public PreviewWindow(IReadOnlyList<FrameItem> frames, FrameItem initialFrame, Func<FrameItem, Task> refreshPreview)
+    public PreviewWindow(
+        IReadOnlyList<FrameItem> frames,
+        FrameItem initialFrame,
+        Func<FrameItem, Task> refreshPreview,
+        Func<FrameItem, FrameBounds, Task> applyFraming,
+        Func<Exception, Task<bool>> recoverIfScannerFaulted)
     {
         InitializeComponent();
         this.frames = frames;
         this.refreshPreview = refreshPreview;
+        this.applyFraming = applyFraming;
+        this.recoverIfScannerFaulted = recoverIfScannerFaulted;
         index = Math.Max(0, frames.ToList().IndexOf(initialFrame));
         Loaded += (_, _) =>
         {
@@ -32,10 +43,13 @@ public partial class PreviewWindow : Window
         FrameTitle.Text = Current.DisplayName;
         FramePosition.Text = $"Frame {index + 1} of {frames.Count} · {(Current.IsIncluded ? "Included" : "Excluded")}";
         Title = $"{Current.DisplayName} — Pakon preview";
+        SetFramingFields(Current.Framing.Current);
+        FramingStatus.Text = DescribeFraming(Current.Framing.Current);
     }
 
     private void Move(int offset)
     {
+        if (framingBusy) return;
         index = (index + offset + frames.Count) % frames.Count;
         UpdateFrame();
         ImageScroller.ScrollToHorizontalOffset(0);
@@ -92,5 +106,97 @@ public partial class PreviewWindow : Window
         var heightScale = Math.Max(0.25, (ImageScroller.ViewportHeight - 70) / source.PixelHeight);
         SetZoom(Math.Min(widthScale, heightScale));
     }
+
+    private void SetFramingFields(FrameBounds bounds)
+    {
+        LeftBox.Text = bounds.Left.ToString();
+        TopBox.Text = bounds.Top.ToString();
+        RightBox.Text = bounds.Right.ToString();
+        BottomBox.Text = bounds.Bottom.ToString();
+    }
+
+    private string DescribeFraming(FrameBounds bounds) =>
+        $"{bounds.Width} × {bounds.Height} px · strip {Current.Framing.StripWidth} × {Current.Framing.StripHeight}";
+
+    private bool TryReadFraming(out FrameBounds bounds)
+    {
+        bounds = Current.Framing.Current;
+        if (!int.TryParse(LeftBox.Text, out var left) ||
+            !int.TryParse(TopBox.Text, out var top) ||
+            !int.TryParse(RightBox.Text, out var right) ||
+            !int.TryParse(BottomBox.Text, out var bottom))
+        {
+            FramingStatus.Text = "Enter whole-number coordinates.";
+            return false;
+        }
+
+        bounds = new FrameBounds(left, top, right, bottom);
+        var framing = Current.Framing;
+        if (left < 0 || top < 0 || right >= framing.StripWidth || bottom >= framing.StripHeight)
+        {
+            FramingStatus.Text = $"Coordinates must remain inside 0–{framing.StripWidth - 1} × 0–{framing.StripHeight - 1}.";
+            return false;
+        }
+        if (bounds.Width < 128 || bounds.Height < 128)
+        {
+            FramingStatus.Text = "The frame must be at least 128 × 128 pixels.";
+            return false;
+        }
+        return true;
+    }
+
+    private async Task ApplyFramingAsync()
+    {
+        if (framingBusy || !TryReadFraming(out var bounds)) return;
+        framingBusy = true;
+        ApplyFramingButton.IsEnabled = false;
+        ResetFramingButton.IsEnabled = false;
+        FramingStatus.Text = "Applying framing…";
+        try
+        {
+            await applyFraming(Current, bounds);
+            UpdateFrame();
+        }
+        catch (Exception exception)
+        {
+            if (await recoverIfScannerFaulted(exception))
+            {
+                Close();
+                return;
+            }
+            FramingStatus.Text = exception.Message;
+            MessageBox.Show(exception.Message, "Could not update framing", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally
+        {
+            framingBusy = false;
+            ApplyFramingButton.IsEnabled = true;
+            ResetFramingButton.IsEnabled = true;
+        }
+    }
+
+    private void Nudge(int horizontal, int vertical)
+    {
+        if (!TryReadFraming(out var bounds)) return;
+        var maximumRight = Current.Framing.StripWidth - 1;
+        var maximumBottom = Current.Framing.StripHeight - 1;
+        var dx = Math.Clamp(horizontal, -bounds.Left, maximumRight - bounds.Right);
+        var dy = Math.Clamp(vertical, -bounds.Top, maximumBottom - bounds.Bottom);
+        SetFramingFields(new FrameBounds(
+            bounds.Left + dx, bounds.Top + dy, bounds.Right + dx, bounds.Bottom + dy));
+        FramingStatus.Text = "Not applied";
+    }
+
+    private void NudgeLeftClicked(object sender, RoutedEventArgs e) => Nudge(-16, 0);
+    private void NudgeRightClicked(object sender, RoutedEventArgs e) => Nudge(16, 0);
+    private void NudgeUpClicked(object sender, RoutedEventArgs e) => Nudge(0, -16);
+    private void NudgeDownClicked(object sender, RoutedEventArgs e) => Nudge(0, 16);
+    private async void ApplyFramingClicked(object sender, RoutedEventArgs e) => await ApplyFramingAsync();
+    private async void ResetFramingClicked(object sender, RoutedEventArgs e)
+    {
+        SetFramingFields(Current.Framing.Detected);
+        await ApplyFramingAsync();
+    }
+
     private void CloseClicked(object sender, RoutedEventArgs e) => Close();
 }

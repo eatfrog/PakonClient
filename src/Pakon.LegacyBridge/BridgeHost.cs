@@ -32,9 +32,15 @@ namespace Pakon.LegacyBridge
                     {
                         pipe.WaitForConnection();
                         var request = PipeJson.Read<BridgeRequest>(pipe);
-                        Console.WriteLine("[{0:O}] request {1} ({2})", DateTime.UtcNow, request == null ? "<missing>" : request.Operation, request == null ? "" : request.RequestId);
                         var response = Dispatch(request);
-                        Console.WriteLine("[{0:O}] response {1}: succeeded={2}; error={3}", DateTime.UtcNow, request == null ? "<missing>" : request.Operation, response.Succeeded, response.Error ?? "");
+                        if (!response.Succeeded)
+                        {
+                            Console.Error.WriteLine(
+                                "[{0:O}] bridge operation {1} failed: {2}",
+                                DateTime.UtcNow,
+                                request == null ? "<missing>" : request.Operation,
+                                response.Error ?? "Unknown error.");
+                        }
                         PipeJson.Write(pipe, response);
                     }
                 }
@@ -114,6 +120,26 @@ namespace Pakon.LegacyBridge
                 if (request.Operation == BridgeOperations.UpdateFrame)
                 {
                     return new BridgeResponse { RequestId = request.RequestId, Succeeded = true, Values = new System.Collections.Generic.Dictionary<string, string>(tlxWorker.Invoke(() => tlxSession.UpdateFrame(request.Arguments))) };
+                }
+
+                if (request.Operation == BridgeOperations.ConfigureFrameLayout)
+                {
+                    return new BridgeResponse { RequestId = request.RequestId, Succeeded = true, Values = new System.Collections.Generic.Dictionary<string, string>(tlxWorker.Invoke(() => tlxSession.ConfigureFrameLayout(request.Arguments))) };
+                }
+
+                if (request.Operation == BridgeOperations.UpdateFrameFraming)
+                {
+                    return new BridgeResponse { RequestId = request.RequestId, Succeeded = true, Values = new System.Collections.Generic.Dictionary<string, string>(tlxWorker.Invoke(() => tlxSession.UpdateFrameFraming(request.Arguments))) };
+                }
+
+                if (request.Operation == BridgeOperations.InsertFrame)
+                {
+                    return new BridgeResponse { RequestId = request.RequestId, Succeeded = true, Values = new System.Collections.Generic.Dictionary<string, string>(tlxWorker.Invoke(() => tlxSession.InsertFrame(request.Arguments))) };
+                }
+
+                if (request.Operation == BridgeOperations.DeleteFrame)
+                {
+                    return new BridgeResponse { RequestId = request.RequestId, Succeeded = true, Values = new System.Collections.Generic.Dictionary<string, string>(tlxWorker.Invoke(() => tlxSession.DeleteFrame(request.Arguments))) };
                 }
 
                 if (request.Operation == BridgeOperations.RenderFrameToDisk)

@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.4.0 — 2026-08-10
+
+### Frame formats and boundaries
+
+- Added frame-layout selection for standard 35 mm, half-frame, and 24 × 65
+  panorama scans.
+- Added controls for adjusting frame width and horizontal position on selected
+  frames or across the roll.
+- Added precise frame-boundary editing in the full-size preview, including
+  nudging and resetting to the scanner-detected boundary.
+- Added commands to split a detected frame into two half-frame pictures, add a
+  manually positioned frame, and delete an unwanted frame.
+- Preserved inclusion, rotation, and image adjustments when frame boundaries
+  are changed and previews are regenerated.
+
+### Scanner reliability
+
+- Restricted TLX completion callbacks to the operation currently in progress,
+  preventing frame edits from racing an active image render.
+- Added automatic bridge restart and clear rescan guidance when the TLX image
+  pipeline faults or stops responding.
+- Added bridge-side logging for failed operations to improve troubleshooting.
+
 ## 0.3.0 — 2026-07-30
 
 ### 16-bit image export

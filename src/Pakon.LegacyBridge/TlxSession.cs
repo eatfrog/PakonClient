@@ -196,6 +196,43 @@ namespace Pakon.LegacyBridge
             }
         }
 
+        public IDictionary<string, string> ConfigureFrameLayout(IDictionary<string, string> arguments)
+        {
+            lock (sync)
+            {
+                RequireReady();
+                var layout = GetRequiredInt32(arguments, "layout");
+                if (layout < 0 || layout > 2) throw new ArgumentOutOfRangeException("layout");
+
+                int heightLowResolution = 0, heightMillimeters = 0, height = 0;
+                int width = 0, widthUnit = 0, left = 0, top = 0, right = 0, bottom = 0;
+                instance.GetScannerInfoPreFrame(
+                    2, 1, ref heightLowResolution, ref heightMillimeters, ref height,
+                    ref width, ref widthUnit, ref left, ref top, ref right, ref bottom);
+
+                var numerator = layout == 1 ? 1 : layout == 2 ? 65 : 1;
+                var denominator = layout == 1 ? 2 : layout == 2 ? 36 : 1;
+                var adjustedWidth = Scale(width, numerator, denominator);
+                var adjustedWidthUnit = Math.Max(Scale(widthUnit, numerator, denominator), adjustedWidth + 25);
+                var adjustedLeft = Math.Max(0, Scale(left, numerator, denominator));
+                var adjustedRight = Math.Min(adjustedWidth - 1, Scale(right, numerator, denominator));
+
+                instance.PutScannerInfoPreFrameUser(
+                    2, 1, adjustedWidth, adjustedWidthUnit,
+                    adjustedLeft, top, adjustedRight, bottom);
+                return new Dictionary<string, string>
+                {
+                    { "layout", layout.ToString(CultureInfo.InvariantCulture) },
+                    { "width", adjustedWidth.ToString(CultureInfo.InvariantCulture) },
+                    { "widthUnit", adjustedWidthUnit.ToString(CultureInfo.InvariantCulture) },
+                    { "left", adjustedLeft.ToString(CultureInfo.InvariantCulture) },
+                    { "top", top.ToString(CultureInfo.InvariantCulture) },
+                    { "right", adjustedRight.ToString(CultureInfo.InvariantCulture) },
+                    { "bottom", bottom.ToString(CultureInfo.InvariantCulture) }
+                };
+            }
+        }
+
         /// <summary>Known conservative F135 trace profile. It intentionally does not enable scratch removal or blind framing.</summary>
         public IDictionary<string, string> ScanTraceProfile()
         {
@@ -308,13 +345,41 @@ namespace Pakon.LegacyBridge
                     int roll, strip, product, specifier, frameNumber, aspect, rotation, selection;
                     string frameName, fileName, directory;
                     instance.GetPictureInfo3(index, out roll, out strip, out product, out specifier, out frameName, out frameNumber, out aspect, out fileName, out directory, out rotation, out selection);
+                    int left = 0, top = 0, right = 0, bottom = 0;
+                    instance.GetPictureFramingUserInfo(index, ref left, ref top, ref right, ref bottom);
+                    int framingRisk = 0, detectedLeft = left, detectedTop = top, detectedRight = right, detectedBottom = bottom;
+                    try
+                    {
+                        instance.GetPictureFramingInfo(index, ref framingRisk, ref detectedLeft, ref detectedTop, ref detectedRight, ref detectedBottom);
+                    }
+                    catch (COMException)
+                    {
+                        // Manually inserted pictures have no algorithm-detected rectangle.
+                        // Their creation rectangle is the only meaningful Reset target.
+                        framingRisk = 0;
+                        detectedLeft = left; detectedTop = top; detectedRight = right; detectedBottom = bottom;
+                    }
+                    int stripWidth, stripHeight;
+                    GetStripDimensions(strip, out stripWidth, out stripHeight);
                     var key = "frame." + index.ToString(CultureInfo.InvariantCulture) + ".";
                     result[key + "frameName"] = frameName ?? string.Empty;
+                    result[key + "stripIndex"] = strip.ToString(CultureInfo.InvariantCulture);
                     result[key + "frameNumber"] = frameNumber.ToString(CultureInfo.InvariantCulture);
                     result[key + "filmProduct"] = product.ToString(CultureInfo.InvariantCulture);
                     result[key + "filmSpecifier"] = specifier.ToString(CultureInfo.InvariantCulture);
                     result[key + "rotation"] = rotation.ToString(CultureInfo.InvariantCulture);
                     result[key + "selection"] = selection.ToString(CultureInfo.InvariantCulture);
+                    result[key + "framing.left"] = left.ToString(CultureInfo.InvariantCulture);
+                    result[key + "framing.top"] = top.ToString(CultureInfo.InvariantCulture);
+                    result[key + "framing.right"] = right.ToString(CultureInfo.InvariantCulture);
+                    result[key + "framing.bottom"] = bottom.ToString(CultureInfo.InvariantCulture);
+                    result[key + "detectedFraming.left"] = detectedLeft.ToString(CultureInfo.InvariantCulture);
+                    result[key + "detectedFraming.top"] = detectedTop.ToString(CultureInfo.InvariantCulture);
+                    result[key + "detectedFraming.right"] = detectedRight.ToString(CultureInfo.InvariantCulture);
+                    result[key + "detectedFraming.bottom"] = detectedBottom.ToString(CultureInfo.InvariantCulture);
+                    result[key + "framingRisk"] = framingRisk.ToString(CultureInfo.InvariantCulture);
+                    result[key + "stripWidth"] = stripWidth.ToString(CultureInfo.InvariantCulture);
+                    result[key + "stripHeight"] = stripHeight.ToString(CultureInfo.InvariantCulture);
                 }
                 return result;
             }
@@ -452,9 +517,14 @@ namespace Pakon.LegacyBridge
         {
             lock (sync)
             {
-                // The installed TLX 1.1 type library uses 3000 for WTP_ProgressComplete.
+                // The installed TLX 1.1 type library uses 3000 for
+                // WTP_ProgressComplete. Several callback families can be active at
+                // once, so completion is authoritative only when it belongs to the
+                // operation represented by the current session state. Treating an
+                // unrelated completion as Ready allows picture-list edits to race a
+                // SaveToDisk worker that is still reading its image buffer.
                 if (IsErrorOperation(operation)) state = "Faulted";
-                else if (status == 3000 && state != "Closed") state = "Ready";
+                else if (status == 3000 && CompletesCurrentOperation(operation)) state = "Ready";
                 var operationName = TlxCallbackDecoder.OperationName(operation);
                 var statusMeaning = TlxCallbackDecoder.StatusMeaning(operation, status);
                 Log("callback operation=" + operation.ToString(CultureInfo.InvariantCulture) + " (" + operationName + "); status=" + status.ToString(CultureInfo.InvariantCulture) + " (" + statusMeaning + "); state=" + state);
@@ -489,6 +559,14 @@ namespace Pakon.LegacyBridge
         private static bool IsErrorOperation(int operation)
         {
             return operation == 1 || operation == 13 || operation == 15 || operation == 35 || operation == 39 || operation == 41;
+        }
+
+        private bool CompletesCurrentOperation(int operation)
+        {
+            if (state == "Initializing") return operation == 0;
+            if (state == "Scanning" || state == "CancellingScan") return operation == 34;
+            if (state == "Saving" || state == "CancellingSave") return operation == 38;
+            return false;
         }
 
         private string DrainLastErrors(int callbackOperation, int callbackStatus)
@@ -753,6 +831,102 @@ namespace Pakon.LegacyBridge
             AddNativeRuntimeDirectoriesToPath(directory);
             if (!SetDllDirectory(directory)) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error(), "SetDllDirectory failed for '" + directory + "'.");
             Environment.CurrentDirectory = directory;
+        }
+
+        public IDictionary<string, string> UpdateFrameFraming(IDictionary<string, string> arguments)
+        {
+            lock (sync)
+            {
+                RequireReady();
+                var index = GetRequiredInt32(arguments, "index");
+                var left = GetRequiredInt32(arguments, "left");
+                var top = GetRequiredInt32(arguments, "top");
+                var right = GetRequiredInt32(arguments, "right");
+                var bottom = GetRequiredInt32(arguments, "bottom");
+
+                int roll, strip, product, specifier, frameNumber, aspect, rotation, selection;
+                string frameName, fileName, directory;
+                instance.GetPictureInfo3(index, out roll, out strip, out product, out specifier, out frameName, out frameNumber, out aspect, out fileName, out directory, out rotation, out selection);
+                int stripWidth, stripHeight;
+                GetStripDimensions(strip, out stripWidth, out stripHeight);
+                ValidateFraming(left, top, right, bottom, stripWidth, stripHeight);
+
+                instance.PutPictureFramingUserInfo(index, left, top, right, bottom);
+                return new Dictionary<string, string>
+                {
+                    { "index", index.ToString(CultureInfo.InvariantCulture) },
+                    { "left", left.ToString(CultureInfo.InvariantCulture) },
+                    { "top", top.ToString(CultureInfo.InvariantCulture) },
+                    { "right", right.ToString(CultureInfo.InvariantCulture) },
+                    { "bottom", bottom.ToString(CultureInfo.InvariantCulture) }
+                };
+            }
+        }
+
+        public IDictionary<string, string> InsertFrame(IDictionary<string, string> arguments)
+        {
+            lock (sync)
+            {
+                RequireReady();
+                var insertBeforeIndex = GetRequiredInt32(arguments, "insertBeforeIndex");
+                var stripIndex = GetRequiredInt32(arguments, "stripIndex");
+                var left = GetRequiredInt32(arguments, "left");
+                var top = GetRequiredInt32(arguments, "top");
+                var right = GetRequiredInt32(arguments, "right");
+                var bottom = GetRequiredInt32(arguments, "bottom");
+                int stripWidth, stripHeight;
+                GetStripDimensions(stripIndex, out stripWidth, out stripHeight);
+                ValidateFraming(left, top, right, bottom, stripWidth, stripHeight);
+                instance.InsertPicture(insertBeforeIndex, stripIndex, left, top, right, bottom);
+                return new Dictionary<string, string> { { "inserted", "true" } };
+            }
+        }
+
+        public IDictionary<string, string> DeleteFrame(IDictionary<string, string> arguments)
+        {
+            lock (sync)
+            {
+                RequireReady();
+                var index = GetRequiredInt32(arguments, "index");
+                instance.DeletePicture(index);
+                return new Dictionary<string, string>
+                {
+                    { "deletedIndex", index.ToString(CultureInfo.InvariantCulture) }
+                };
+            }
+        }
+
+        private void GetStripDimensions(int stripIndex, out int width, out int height)
+        {
+            int roll = 0, isStrip = 0, filmColor = 0, filmFormat = 0;
+            int heightHighResolution = 0, lengthHighResolution = 0;
+            int heightLowResolution = 0, lengthLowResolution = 0;
+            int warnings = 0, product = 0, specifier = 0, filmId = 0;
+            int dminRed = 0, dminGreen = 0, dminBlue = 0;
+            string rollId = string.Empty;
+            instance.GetStripInfo(
+                stripIndex, ref roll, ref isStrip, ref filmColor, ref filmFormat,
+                ref heightHighResolution, ref lengthHighResolution,
+                ref heightLowResolution, ref lengthLowResolution,
+                ref warnings, ref product, ref specifier, ref filmId,
+                ref dminRed, ref dminGreen, ref dminBlue, ref rollId);
+            width = lengthHighResolution;
+            height = heightHighResolution;
+        }
+
+        private static void ValidateFraming(int left, int top, int right, int bottom, int stripWidth, int stripHeight)
+        {
+            if (left < 0 || top < 0 || right >= stripWidth || bottom >= stripHeight)
+                throw new ArgumentOutOfRangeException("framing", "Framing must remain inside the scanned strip.");
+            if (right - left < 128 || bottom - top < 128)
+                throw new ArgumentException("Framing must be at least 128 by 128 high-resolution pixels.");
+        }
+
+        private static int Scale(int value, int numerator, int denominator)
+        {
+            return (int)Math.Round(
+                value * (double)numerator / denominator,
+                MidpointRounding.AwayFromZero);
         }
 
         private static void AddNativeRuntimeDirectoriesToPath(string comServerDirectory)

@@ -16,7 +16,15 @@ public interface IScannerWorkflow : IDisposable
 
     Task<IReadOnlyList<CapturedFrame>> CompleteCaptureAsync(CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyList<CapturedFrame>> GetFramesAsync(CancellationToken cancellationToken = default);
+
     Task<RenderedFrame> RenderFrameAsync(FrameRenderRequest request, CancellationToken cancellationToken = default);
+
+    Task UpdateFrameFramingAsync(int frameIndex, FrameBounds bounds, CancellationToken cancellationToken = default);
+
+    Task InsertFrameAsync(int insertBeforeIndex, int stripIndex, FrameBounds bounds, CancellationToken cancellationToken = default);
+
+    Task DeleteFrameAsync(int frameIndex, CancellationToken cancellationToken = default);
 
     Task CancelCaptureAsync(CancellationToken cancellationToken = default);
 

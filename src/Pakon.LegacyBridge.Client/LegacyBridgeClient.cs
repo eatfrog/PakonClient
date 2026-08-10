@@ -95,6 +95,39 @@ public sealed class LegacyBridgeClient
             ["selected"] = selected.ToString(CultureInfo.InvariantCulture)
         }, cancellationToken);
 
+    public Task<BridgeResponse> ConfigureFrameLayoutAsync(int layout, CancellationToken cancellationToken = default) =>
+        SendAsync(BridgeOperations.ConfigureFrameLayout, new Dictionary<string, string>
+        {
+            ["layout"] = layout.ToString(CultureInfo.InvariantCulture)
+        }, cancellationToken);
+
+    public Task<BridgeResponse> UpdateFrameFramingAsync(int index, int left, int top, int right, int bottom, CancellationToken cancellationToken = default) =>
+        SendAsync(BridgeOperations.UpdateFrameFraming, new Dictionary<string, string>
+        {
+            ["index"] = index.ToString(CultureInfo.InvariantCulture),
+            ["left"] = left.ToString(CultureInfo.InvariantCulture),
+            ["top"] = top.ToString(CultureInfo.InvariantCulture),
+            ["right"] = right.ToString(CultureInfo.InvariantCulture),
+            ["bottom"] = bottom.ToString(CultureInfo.InvariantCulture)
+        }, cancellationToken);
+
+    public Task<BridgeResponse> InsertFrameAsync(int insertBeforeIndex, int stripIndex, int left, int top, int right, int bottom, CancellationToken cancellationToken = default) =>
+        SendAsync(BridgeOperations.InsertFrame, new Dictionary<string, string>
+        {
+            ["insertBeforeIndex"] = insertBeforeIndex.ToString(CultureInfo.InvariantCulture),
+            ["stripIndex"] = stripIndex.ToString(CultureInfo.InvariantCulture),
+            ["left"] = left.ToString(CultureInfo.InvariantCulture),
+            ["top"] = top.ToString(CultureInfo.InvariantCulture),
+            ["right"] = right.ToString(CultureInfo.InvariantCulture),
+            ["bottom"] = bottom.ToString(CultureInfo.InvariantCulture)
+        }, cancellationToken);
+
+    public Task<BridgeResponse> DeleteFrameAsync(int index, CancellationToken cancellationToken = default) =>
+        SendAsync(BridgeOperations.DeleteFrame, new Dictionary<string, string>
+        {
+            ["index"] = index.ToString(CultureInfo.InvariantCulture)
+        }, cancellationToken);
+
     public Task<BridgeResponse> RenderFrameToDiskAsync(int index, string outputPath, int saveControl, int width, int height, int quality = 95, CancellationToken cancellationToken = default) =>
         SendAsync(BridgeOperations.RenderFrameToDisk, new Dictionary<string, string>
         {
@@ -148,10 +181,8 @@ public sealed class LegacyBridgeClient
     private async Task<BridgeResponse> SendAsync(string operation, Dictionary<string, string> arguments, CancellationToken cancellationToken)
     {
         var request = new BridgeRequest { RequestId = Guid.NewGuid().ToString("N"), Operation = operation, Arguments = arguments };
-        Console.WriteLine("[{0:O}] bridge request {1} ({2})", DateTime.UtcNow, operation, request.RequestId);
         using var pipe = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
         await pipe.ConnectAsync(cancellationToken).ConfigureAwait(false);
-        Console.WriteLine("[{0:O}] bridge connected", DateTime.UtcNow);
         await PipeJson.WriteAsync(pipe, request, cancellationToken).ConfigureAwait(false);
         var response = await PipeJson.ReadAsync<BridgeResponse>(pipe, cancellationToken).ConfigureAwait(false);
         if (response is null || response.RequestId != request.RequestId)
@@ -159,7 +190,6 @@ public sealed class LegacyBridgeClient
             throw new InvalidDataException("The legacy bridge returned an invalid response.");
         }
 
-        Console.WriteLine("[{0:O}] bridge response {1}: succeeded={2}", DateTime.UtcNow, operation, response.Succeeded);
         return response;
     }
 

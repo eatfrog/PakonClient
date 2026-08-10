@@ -53,6 +53,8 @@ public sealed class LegacyF135ScannerWorkflow : IScannerWorkflow
         };
         var scanControl = request.UseDigitalIce ? 0x08 : 0;
 
+        await RequireSuccess(bridge.ConfigureFrameLayoutAsync((int)request.FrameLayout, cancellationToken));
+
         // The legacy adapter is the only place where TLX enum values are allowed.
         await RequireSuccess(bridge.ScanRollAsync(
             resolution: 2,
@@ -66,6 +68,11 @@ public sealed class LegacyF135ScannerWorkflow : IScannerWorkflow
     public async Task<IReadOnlyList<CapturedFrame>> CompleteCaptureAsync(CancellationToken cancellationToken = default)
     {
         await RequireSuccess(bridge.MoveOldestRollToSaveGroupAsync(cancellationToken));
+        return await GetFramesAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<CapturedFrame>> GetFramesAsync(CancellationToken cancellationToken = default)
+    {
         var response = await RequireSuccess(bridge.GetFramesAsync(cancellationToken));
         var count = ParseInt(response.Values, "count", 0);
         var frames = new List<CapturedFrame>(count);
@@ -74,12 +81,18 @@ public sealed class LegacyF135ScannerWorkflow : IScannerWorkflow
             var key = $"frame.{index}.";
             frames.Add(new CapturedFrame(
                 index,
+                ParseInt(response.Values, key + "stripIndex", 0),
                 ParseInt(response.Values, key + "frameNumber", index + 1),
                 response.Values.GetValueOrDefault(key + "frameName", string.Empty),
                 ParseInt(response.Values, key + "filmProduct", -1),
                 ParseInt(response.Values, key + "filmSpecifier", -1),
                 ParseInt(response.Values, key + "rotation", 0),
-                ParseInt(response.Values, key + "selection", 1) != 0));
+                ParseInt(response.Values, key + "selection", 1) != 0,
+                new FrameFraming(
+                    ParseBounds(response.Values, key + "framing."),
+                    ParseBounds(response.Values, key + "detectedFraming."),
+                    ParseInt(response.Values, key + "stripWidth", 0),
+                    ParseInt(response.Values, key + "stripHeight", 0))));
         }
         return frames;
     }
@@ -115,6 +128,26 @@ public sealed class LegacyF135ScannerWorkflow : IScannerWorkflow
             cancellationToken));
         return new RenderedFrame(diskResponse.Values.GetValueOrDefault("outputPath", request.OutputPath));
     }
+
+    public async Task UpdateFrameFramingAsync(
+        int frameIndex,
+        FrameBounds bounds,
+        CancellationToken cancellationToken = default) =>
+        await RequireSuccess(bridge.UpdateFrameFramingAsync(
+            frameIndex, bounds.Left, bounds.Top, bounds.Right, bounds.Bottom, cancellationToken));
+
+    public async Task InsertFrameAsync(
+        int insertBeforeIndex,
+        int stripIndex,
+        FrameBounds bounds,
+        CancellationToken cancellationToken = default) =>
+        await RequireSuccess(bridge.InsertFrameAsync(
+            insertBeforeIndex, stripIndex,
+            bounds.Left, bounds.Top, bounds.Right, bounds.Bottom,
+            cancellationToken));
+
+    public async Task DeleteFrameAsync(int frameIndex, CancellationToken cancellationToken = default) =>
+        await RequireSuccess(bridge.DeleteFrameAsync(frameIndex, cancellationToken));
 
     public async Task CancelCaptureAsync(CancellationToken cancellationToken = default) =>
         await RequireSuccess(bridge.CancelScanAsync(cancellationToken));
@@ -154,6 +187,15 @@ public sealed class LegacyF135ScannerWorkflow : IScannerWorkflow
         int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed)
             ? parsed
             : fallback;
+
+    private static FrameBounds ParseBounds(
+        IReadOnlyDictionary<string, string> values,
+        string key) =>
+        new(
+            ParseInt(values, key + "left", 0),
+            ParseInt(values, key + "top", 0),
+            ParseInt(values, key + "right", 0),
+            ParseInt(values, key + "bottom", 0));
 
     private static int? ParseNullableInt(
         IReadOnlyDictionary<string, string> values,

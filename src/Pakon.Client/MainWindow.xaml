@@ -64,6 +64,12 @@
                     <RadioButton x:Name="ColorPositiveRadio" Content="Color positive / slide" GroupName="Film" Checked="FilmTypeChanged"/>
                     <RadioButton x:Name="BlackWhiteRadio" Content="Black &amp; white negative" GroupName="Film"
                                  Checked="FilmTypeChanged"/>
+                    <TextBlock Text="Frame format" FontWeight="SemiBold" Margin="0,20,0,6"/>
+                    <ComboBox x:Name="FrameLayoutCombo" SelectedIndex="0" Padding="8,6">
+                        <ComboBoxItem Content="Standard 35 mm · 24 × 36"/>
+                        <ComboBoxItem Content="Half-frame · 18 × 24"/>
+                        <ComboBoxItem Content="Panorama · 24 × 65"/>
+                    </ComboBox>
                     <Separator Margin="0,22"/>
                     <Grid>
                         <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
@@ -137,7 +143,8 @@
                                 </Border>
                                 <Grid Grid.Row="1" Margin="3,8,3,1">
                                     <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
-                                    <CheckBox HorizontalAlignment="Right" IsChecked="{Binding IsIncluded}" ToolTip="Include when saving"/>
+                                    <CheckBox HorizontalAlignment="Right" IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                              ToolTip="Select frame" Checked="FrameSelectionChanged" Unchecked="FrameSelectionChanged"/>
                                 </Grid>
                             </Grid>
                         </Border>
@@ -165,7 +172,8 @@
                 <DockPanel>
                     <Button DockPanel.Dock="Bottom" Content="Continue to saving" Background="{StaticResource AccentBrush}"
                             Margin="0,22,0,0" Click="ContinueToSavingClicked"/>
-                    <StackPanel>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,0,8,0">
                         <TextBlock x:Name="EditSelectionTitle" Text="Select a frame" FontFamily="Georgia" FontSize="23" FontWeight="Bold"/>
                         <TextBlock Text="Click frames to edit one or several together." Foreground="{StaticResource MutedBrush}"
                                    FontSize="12" TextWrapping="Wrap" Margin="0,6,0,20"/>
@@ -177,6 +185,44 @@
                             <Button Content="Include" Style="{StaticResource SecondaryButton}" Padding="10,7" Margin="0,0,5,0" Click="IncludeSelectedClicked"/>
                             <Button Content="Exclude" Style="{StaticResource SecondaryButton}" Padding="10,7" Margin="5,0,0,0" Click="ExcludeSelectedClicked"/>
                         </UniformGrid>
+                        <TextBlock Text="Frame sizing and position" FontWeight="SemiBold"/>
+                        <TextBlock Text="Apply to selected frames or every frame. Width changes equally from both edges; positive nudge moves right."
+                                   Foreground="{StaticResource MutedBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,8"/>
+                        <Grid Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="76"/></Grid.ColumnDefinitions>
+                            <TextBlock Text="Width change (px)" VerticalAlignment="Center"/>
+                            <TextBox x:Name="BulkWidthDeltaBox" Grid.Column="1" Text="0" Padding="6,4" TextAlignment="Right"/>
+                        </Grid>
+                        <UniformGrid Columns="2" Margin="0,0,0,8">
+                            <Button Content="Narrower 32" Style="{StaticResource SecondaryButton}" Padding="8,6" Margin="0,0,4,0" Click="BulkNarrowerClicked"/>
+                            <Button Content="Wider 32" Style="{StaticResource SecondaryButton}" Padding="8,6" Margin="4,0,0,0" Click="BulkWiderClicked"/>
+                        </UniformGrid>
+                        <Grid Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="76"/></Grid.ColumnDefinitions>
+                            <TextBlock Text="Horizontal nudge (px)" VerticalAlignment="Center"/>
+                            <TextBox x:Name="BulkNudgeBox" Grid.Column="1" Text="0" Padding="6,4" TextAlignment="Right"/>
+                        </Grid>
+                        <UniformGrid Columns="2" Margin="0,0,0,8">
+                            <Button Content="← 16" Style="{StaticResource SecondaryButton}" Padding="8,6" Margin="0,0,4,0" Click="BulkNudgeLeftClicked"/>
+                            <Button Content="16 →" Style="{StaticResource SecondaryButton}" Padding="8,6" Margin="4,0,0,0" Click="BulkNudgeRightClicked"/>
+                        </UniformGrid>
+                        <UniformGrid Columns="2">
+                            <Button x:Name="SelectedApplyFramingButton" Content="Apply selected" Style="{StaticResource SecondaryButton}"
+                                    Padding="6,7" Margin="0,0,4,0" Click="ApplySelectedFramingClicked"/>
+                            <Button x:Name="BulkApplyFramingButton" Content="Apply to all" Background="{StaticResource GreenBrush}"
+                                    Padding="8,7" Margin="4,0,0,0" Click="ApplyBulkFramingClicked"/>
+                        </UniformGrid>
+                        <TextBlock x:Name="BulkFramingStatus" Foreground="{StaticResource MutedBrush}" FontSize="11"
+                                   TextWrapping="Wrap" Margin="0,5,0,16"/>
+                        <TextBlock Text="Frame boundaries" FontWeight="SemiBold"/>
+                        <TextBlock Text="Select one frame. Split creates two half-frame pictures; Add duplicates its boundary for manual positioning."
+                                   Foreground="{StaticResource MutedBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,8"/>
+                        <UniformGrid Columns="2" Margin="0,0,0,6">
+                            <Button Content="Split half-frame" Style="{StaticResource SecondaryButton}" Padding="9,7" Margin="0,0,5,0" Click="SplitFrameClicked"/>
+                            <Button Content="Add frame" Style="{StaticResource SecondaryButton}" Padding="9,7" Margin="5,0,0,0" Click="AddFrameClicked"/>
+                        </UniformGrid>
+                        <Button Content="Delete frame" Style="{StaticResource SecondaryButton}" Padding="10,7"
+                                Margin="0,0,0,14" Click="DeleteFrameClicked"/>
                         <TextBlock Text="Exposure (stops)" FontWeight="SemiBold"/>
                         <Slider x:Name="ExposureSlider" Minimum="-2" Maximum="2"
                                 SmallChange="0.1" LargeChange="0.5" ValueChanged="AdjustmentChanged"/>
@@ -194,6 +240,7 @@
                         <Button Content="Reset adjustments" Style="{StaticResource SecondaryButton}" Padding="12,8"
                                 Margin="0,8,0,0" Click="ResetAdjustmentsClicked"/>
                     </StackPanel>
+                    </ScrollViewer>
                 </DockPanel>
             </Border>
         </Grid>

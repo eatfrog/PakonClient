@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -25,7 +26,9 @@ public partial class MainWindow : Window
     private bool scannerReady;
     private bool updatingSliders;
     private bool closing;
+    private bool faultRecoveryActive;
     private FilmKind activeFilmKind = FilmKind.ColorNegative;
+    private FrameLayout activeFrameLayout = FrameLayout.Standard;
 
     private bool IsBlackAndWhite => BlackWhiteRadio.IsChecked == true;
     private bool IsColorNegative => ColorNegativeRadio.IsChecked == true;
@@ -131,8 +134,8 @@ public partial class MainWindow : Window
             SetConnection("Scanner unavailable", "#B44131");
             ShowPage(SetupPage);
             var retry = MessageBox.Show($"{ex.Message}\n\nCheck scanner power and USB, then choose Retry.",
-                "Scanner initialization failed", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            if (retry == MessageBoxResult.Yes) await InitializeScannerAsync();
+                "Scanner initialization failed", MessageBoxButton.RetryCancel, MessageBoxImage.Warning);
+            if (retry == MessageBoxResult.Retry) await InitializeScannerAsync();
         }
     }
 
@@ -145,6 +148,12 @@ public partial class MainWindow : Window
             : IsPositiveSlide
                 ? FilmKind.ColorPositive
                 : FilmKind.BlackAndWhite;
+        activeFrameLayout = FrameLayoutCombo.SelectedIndex switch
+        {
+            1 => FrameLayout.HalfFrame,
+            2 => FrameLayout.Panorama,
+            _ => FrameLayout.Standard
+        };
         ShowPage(ScanningPage);
         ProgressTitle.Text = "Scanning your roll";
         ScanStatusText.Text = "The scanner is finding and capturing each frame.";
@@ -153,7 +162,7 @@ public partial class MainWindow : Window
         try
         {
             await scannerWorkflow.BeginCaptureAsync(
-                new CaptureRequest(activeFilmKind, IceCheckBox.IsChecked == true),
+                new CaptureRequest(activeFilmKind, IceCheckBox.IsChecked == true, activeFrameLayout),
                 operationCancellation.Token);
             await PollUntilReadyAsync("Scanning roll", operationCancellation.Token, TimeSpan.FromMinutes(20));
             ScanStatusText.Text = "Preparing previews…";
@@ -298,14 +307,105 @@ public partial class MainWindow : Window
         throw new TimeoutException("The scanner did not become ready after restarting.");
     }
 
+    private async Task<bool> RecoverIfScannerFaultedAsync(Exception operationException)
+    {
+        ScannerStatus? status = null;
+        Exception? statusException = null;
+        try
+        {
+            status = await GetScannerStatusWithTimeoutAsync();
+            if (status.State != ScannerState.Faulted) return false;
+        }
+        catch (Exception exception)
+        {
+            // A bridge that no longer answers after a scanner operation fails is
+            // just as unusable as an explicitly faulted TLX session.
+            statusException = exception;
+        }
+
+        if (faultRecoveryActive) return true;
+        faultRecoveryActive = true;
+        scannerReady = false;
+        adjustmentTimer.Stop();
+        operationCancellation?.Cancel();
+        StartScanButton.IsEnabled = false;
+        ReviewPage.IsEnabled = false;
+        SavePage.IsEnabled = false;
+        ProgressCancelButton.Visibility = Visibility.Collapsed;
+        ProgressTitle.Text = "Recovering scanner connection";
+        ScanStatusText.Text = "The TLX image pipeline stopped. Restarting the isolated bridge…";
+        ScanProgress.IsIndeterminate = true;
+        SetConnection("Scanner pipeline stopped", "#B44131");
+        ShowPage(ScanningPage);
+
+        var failure = status?.Failure;
+        if (string.IsNullOrWhiteSpace(failure)) failure = operationException.Message;
+        if (statusException != null)
+            failure += $"\nStatus check failed: {statusException.Message}";
+
+        try
+        {
+            await RestartScannerAsync();
+            frames.Clear();
+            page = 0;
+            FrameGrid.ItemsSource = null;
+            ReviewPage.IsEnabled = true;
+            SavePage.IsEnabled = true;
+            ShowPage(SetupPage);
+            MessageBox.Show(
+                "The TLX image pipeline stopped and could not continue using the current scan. " +
+                "The scanner connection has been restarted; the roll must be scanned again.\n\n" + failure,
+                "Scanner connection restarted",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
+        catch (Exception recoveryException)
+        {
+            scannerReady = false;
+            StartScanButton.IsEnabled = false;
+            ReviewPage.IsEnabled = true;
+            SavePage.IsEnabled = true;
+            SetConnection("Scanner unavailable", "#B44131");
+            ShowPage(SetupPage);
+            MessageBox.Show(
+                "The TLX image pipeline stopped and the scanner connection could not be restarted. " +
+                "Restart the application after checking scanner power and USB.\n\n" +
+                failure + "\n\nRecovery failed: " + recoveryException.Message,
+                "Scanner unavailable",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+        finally
+        {
+            faultRecoveryActive = false;
+        }
+
+        return true;
+    }
+
     private static bool IsFilmTailFirstError(string message) =>
         message.Contains("film tail first", StringComparison.OrdinalIgnoreCase) ||
         message.Contains("0xE0000000", StringComparison.OrdinalIgnoreCase);
 
     private async Task LoadFramesAndPreviewsAsync(CancellationToken cancellationToken)
     {
-        frames.Clear();
         var capturedFrames = await scannerWorkflow.CompleteCaptureAsync(cancellationToken);
+        await PopulateFramesAndPreviewsAsync(capturedFrames, [], cancellationToken);
+    }
+
+    private async Task ReloadFramesAndPreviewsAsync(CancellationToken cancellationToken)
+    {
+        var previousFrames = frames.ToArray();
+        var capturedFrames = await scannerWorkflow.GetFramesAsync(cancellationToken);
+        await PopulateFramesAndPreviewsAsync(capturedFrames, previousFrames, cancellationToken);
+    }
+
+    private async Task PopulateFramesAndPreviewsAsync(
+        IReadOnlyList<CapturedFrame> capturedFrames,
+        IReadOnlyList<FrameItem> previousFrames,
+        CancellationToken cancellationToken)
+    {
+        frames.Clear();
         for (var index = 0; index < capturedFrames.Count; index++)
         {
             var capturedFrame = capturedFrames[index];
@@ -329,10 +429,23 @@ public partial class MainWindow : Window
             var frame = new FrameItem
             {
                 Index = capturedFrame.Index,
+                StripIndex = capturedFrame.StripIndex,
                 FrameNumber = frameNumber <= 0 ? index + 1 : frameNumber,
                 FrameName = frameName,
-                SourcePath = sourcePath
+                SourcePath = sourcePath,
+                Framing = capturedFrame.Framing
             };
+            var previous = FindPreviousFrame(previousFrames, capturedFrame);
+            if (previous != null)
+            {
+                frame.IsIncluded = previous.IsIncluded;
+                frame.Rotation = previous.Rotation;
+                frame.Exposure = previous.Exposure;
+                frame.Contrast = previous.Contrast;
+                frame.RedBalance = previous.RedBalance;
+                frame.GreenBalance = previous.GreenBalance;
+                frame.BlueBalance = previous.BlueBalance;
+            }
             frame.PropertyChanged += (_, args) =>
             {
                 if (args.PropertyName == nameof(FrameItem.IsIncluded)) UpdateReviewSummary();
@@ -350,6 +463,19 @@ public partial class MainWindow : Window
         page = 0;
         UpdatePage();
     }
+
+    private static FrameItem? FindPreviousFrame(
+        IReadOnlyList<FrameItem> previousFrames,
+        CapturedFrame capturedFrame) =>
+        previousFrames
+            .Where(x => x.StripIndex == capturedFrame.StripIndex &&
+                Contains(x.Framing.Current, capturedFrame.Framing.Current))
+            .OrderBy(x => x.Framing.Current.Width * (long)x.Framing.Current.Height)
+            .FirstOrDefault();
+
+    private static bool Contains(FrameBounds outer, FrameBounds inner) =>
+        outer.Left <= inner.Left && outer.Top <= inner.Top &&
+        outer.Right >= inner.Right && outer.Bottom >= inner.Bottom;
 
     private async Task PollUntilReadyAsync(string activity, CancellationToken cancellationToken, TimeSpan timeout)
     {
@@ -402,7 +528,9 @@ public partial class MainWindow : Window
         if (e.ClickCount == 2)
         {
             e.Handled = true;
-            var preview = new PreviewWindow(frames.ToArray(), frame, RefreshFramePreviewAsync) { Owner = this };
+            var preview = new PreviewWindow(
+                frames.ToArray(), frame, RefreshFramePreviewAsync, ApplyFrameFramingAsync,
+                RecoverIfScannerFaultedAsync) { Owner = this };
             preview.ShowDialog();
             return;
         }
@@ -410,6 +538,11 @@ public partial class MainWindow : Window
             foreach (var item in frames) item.IsSelected = false;
         frame.IsSelected = !frame.IsSelected;
         SyncSlidersFromSelection();
+    }
+
+    private void FrameSelectionChanged(object sender, RoutedEventArgs e)
+    {
+        if (IsLoaded) SyncSlidersFromSelection();
     }
 
     private void SyncSlidersFromSelection()
@@ -463,6 +596,38 @@ public partial class MainWindow : Window
             path);
     }
 
+    private async Task ApplyFrameFramingAsync(FrameItem frame, FrameBounds bounds)
+    {
+        await scannerWorkflow.UpdateFrameFramingAsync(frame.Index, bounds);
+        frame.Framing = frame.Framing with { Current = bounds };
+
+        await RenderFramedPreviewAsync(frame);
+    }
+
+    private async Task RenderFramedPreviewAsync(FrameItem frame)
+    {
+        var sourcePath = Path.Combine(
+            sessionDirectory,
+            $"preview-source-{frame.Index:000}-{Guid.NewGuid():N}.jpg");
+        var render = await scannerWorkflow.RenderFrameAsync(
+            new FrameRenderRequest(
+                frame.Index,
+                sourcePath,
+                FrameRenderFormat.Jpeg,
+                activeFilmKind,
+                IceCheckBox.IsChecked == true,
+                LowResolution: true,
+                Width: 900,
+                Height: 620,
+                JpegQuality: 95));
+        await PollUntilReadyAsync(
+            $"Updating framing for {frame.DisplayName}",
+            CancellationToken.None,
+            TimeSpan.FromMinutes(3));
+        frame.SourcePath = render.OutputPath;
+        await RefreshFramePreviewAsync(frame);
+    }
+
     private async void RotateLeftClicked(object sender, RoutedEventArgs e)
     {
         foreach (var frame in SelectedFrames) frame.Rotation -= 90;
@@ -483,6 +648,261 @@ public partial class MainWindow : Window
     private void ExcludeSelectedClicked(object sender, RoutedEventArgs e)
     {
         foreach (var frame in SelectedFrames) frame.IsIncluded = false;
+    }
+
+    private static bool TryReadInteger(TextBox textBox, out int value) =>
+        int.TryParse(
+            textBox.Text,
+            NumberStyles.Integer,
+            CultureInfo.InvariantCulture,
+            out value);
+
+    private void AdjustBulkFramingValue(TextBox textBox, int delta)
+    {
+        if (!TryReadInteger(textBox, out var value)) value = 0;
+        textBox.Text = (value + delta).ToString(CultureInfo.InvariantCulture);
+        BulkFramingStatus.Text = "Not applied";
+    }
+
+    private void BulkNarrowerClicked(object sender, RoutedEventArgs e) =>
+        AdjustBulkFramingValue(BulkWidthDeltaBox, -32);
+
+    private void BulkWiderClicked(object sender, RoutedEventArgs e) =>
+        AdjustBulkFramingValue(BulkWidthDeltaBox, 32);
+
+    private void BulkNudgeLeftClicked(object sender, RoutedEventArgs e) =>
+        AdjustBulkFramingValue(BulkNudgeBox, -16);
+
+    private void BulkNudgeRightClicked(object sender, RoutedEventArgs e) =>
+        AdjustBulkFramingValue(BulkNudgeBox, 16);
+
+    private async void ApplySelectedFramingClicked(object sender, RoutedEventArgs e)
+    {
+        var selected = SelectedFrames.ToArray();
+        if (selected.Length == 0)
+        {
+            BulkFramingStatus.Text = "Select at least one frame first.";
+            return;
+        }
+        await ApplyFramingAdjustmentAsync(selected, "selected frames");
+    }
+
+    private async void ApplyBulkFramingClicked(object sender, RoutedEventArgs e) =>
+        await ApplyFramingAdjustmentAsync(frames.ToArray(), "all frames");
+
+    private async Task ApplyFramingAdjustmentAsync(
+        IReadOnlyList<FrameItem> targetFrames,
+        string targetDescription)
+    {
+        if (!TryReadInteger(BulkWidthDeltaBox, out var widthDelta) ||
+            !TryReadInteger(BulkNudgeBox, out var horizontalNudge))
+        {
+            BulkFramingStatus.Text = "Enter whole-number pixel adjustments.";
+            return;
+        }
+        if (widthDelta == 0 && horizontalNudge == 0)
+        {
+            BulkFramingStatus.Text = "No framing change to apply.";
+            return;
+        }
+
+        var changes = new List<(FrameItem Frame, FrameBounds Original, FrameBounds Updated)>();
+        foreach (var frame in targetFrames)
+        {
+            var original = frame.Framing.Current;
+            var leftWidthChange = widthDelta / 2;
+            var rightWidthChange = widthDelta - leftWidthChange;
+            var updated = new FrameBounds(
+                original.Left - leftWidthChange + horizontalNudge,
+                original.Top,
+                original.Right + rightWidthChange + horizontalNudge,
+                original.Bottom);
+            if (updated.Left < 0 || updated.Right >= frame.Framing.StripWidth)
+            {
+                BulkFramingStatus.Text = $"{frame.DisplayName} would extend beyond the scanned strip.";
+                return;
+            }
+            if (updated.Width < 128)
+            {
+                BulkFramingStatus.Text = $"{frame.DisplayName} would become narrower than 128 pixels.";
+                return;
+            }
+            changes.Add((frame, original, updated));
+        }
+
+        BulkApplyFramingButton.IsEnabled = false;
+        SelectedApplyFramingButton.IsEnabled = false;
+        var applied = new List<(FrameItem Frame, FrameBounds Original)>();
+        try
+        {
+            BulkFramingStatus.Text = "Updating native frame boundaries…";
+            foreach (var change in changes)
+            {
+                await scannerWorkflow.UpdateFrameFramingAsync(change.Frame.Index, change.Updated);
+                applied.Add((change.Frame, change.Original));
+            }
+        }
+        catch (Exception exception)
+        {
+            var rollbackSucceeded = true;
+            foreach (var change in applied.AsEnumerable().Reverse())
+            {
+                try { await scannerWorkflow.UpdateFrameFramingAsync(change.Frame.Index, change.Original); }
+                catch { rollbackSucceeded = false; }
+            }
+            BulkFramingStatus.Text = rollbackSucceeded
+                ? "No changes were kept."
+                : "Rollback was incomplete; reload the scan before making more framing changes.";
+            if (await RecoverIfScannerFaultedAsync(exception))
+            {
+                BulkApplyFramingButton.IsEnabled = true;
+                SelectedApplyFramingButton.IsEnabled = true;
+                return;
+            }
+            MessageBox.Show(exception.Message, $"Could not adjust {targetDescription}", MessageBoxButton.OK, MessageBoxImage.Error);
+            BulkApplyFramingButton.IsEnabled = true;
+            SelectedApplyFramingButton.IsEnabled = true;
+            return;
+        }
+
+        foreach (var change in changes)
+            change.Frame.Framing = change.Frame.Framing with { Current = change.Updated };
+
+        try
+        {
+            for (var index = 0; index < changes.Count; index++)
+            {
+                BulkFramingStatus.Text = $"Refreshing preview {index + 1} of {changes.Count}…";
+                await RenderFramedPreviewAsync(changes[index].Frame);
+            }
+            BulkWidthDeltaBox.Text = "0";
+            BulkNudgeBox.Text = "0";
+            BulkFramingStatus.Text = $"Applied to {changes.Count} frame{(changes.Count == 1 ? string.Empty : "s")}.";
+            FooterText.Text = $"Framing updated for {targetDescription}";
+        }
+        catch (Exception exception)
+        {
+            BulkFramingStatus.Text = "Framing was applied, but one or more previews could not be refreshed.";
+            if (await RecoverIfScannerFaultedAsync(exception)) return;
+            MessageBox.Show(exception.Message, "Preview refresh failed", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        finally
+        {
+            BulkApplyFramingButton.IsEnabled = true;
+            SelectedApplyFramingButton.IsEnabled = true;
+        }
+    }
+
+    private FrameItem? GetSingleSelectedFrame(string operation)
+    {
+        var selected = SelectedFrames.Take(2).ToArray();
+        if (selected.Length == 1) return selected[0];
+        MessageBox.Show(
+            $"Select exactly one frame to {operation}.",
+            "Select one frame",
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
+        return null;
+    }
+
+    private async void AddFrameClicked(object sender, RoutedEventArgs e)
+    {
+        var frame = GetSingleSelectedFrame("add a frame");
+        if (frame == null) return;
+        try
+        {
+            FooterText.Text = "Adding frame…";
+            var insertBefore = frame.Index + 1 < frames.Count ? frame.Index + 1 : int.MaxValue;
+            await scannerWorkflow.InsertFrameAsync(insertBefore, frame.StripIndex, frame.Framing.Current);
+            await ReloadFramesAndPreviewsAsync(CancellationToken.None);
+            if (frame.Index + 1 < frames.Count) frames[frame.Index + 1].IsSelected = true;
+            SyncSlidersFromSelection();
+            FooterText.Text = "Frame added · Double-click it to adjust framing";
+        }
+        catch (Exception exception)
+        {
+            if (await RecoverIfScannerFaultedAsync(exception)) return;
+            MessageBox.Show(exception.Message, "Could not add frame", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private async void SplitFrameClicked(object sender, RoutedEventArgs e)
+    {
+        var frame = GetSingleSelectedFrame("split it");
+        if (frame == null) return;
+        var bounds = frame.Framing.Current;
+        var middle = bounds.Left + bounds.Width / 2;
+        var first = bounds with { Right = middle };
+        var second = bounds with { Left = middle };
+        if (first.Width < 128 || second.Width < 128)
+        {
+            MessageBox.Show(
+                "This frame is too narrow to split into two valid TLX pictures.",
+                "Cannot split frame",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+            return;
+        }
+
+        var insertedIndex = frame.Index + 1;
+        var insertBefore = insertedIndex < frames.Count ? insertedIndex : int.MaxValue;
+        var inserted = false;
+        var originalUpdated = false;
+        try
+        {
+            FooterText.Text = "Splitting half-frame pair…";
+            await scannerWorkflow.InsertFrameAsync(insertBefore, frame.StripIndex, second);
+            inserted = true;
+            await scannerWorkflow.UpdateFrameFramingAsync(frame.Index, first);
+            originalUpdated = true;
+            await ReloadFramesAndPreviewsAsync(CancellationToken.None);
+            foreach (var item in frames) item.IsSelected = false;
+            if (frame.Index < frames.Count) frames[frame.Index].IsSelected = true;
+            if (insertedIndex < frames.Count) frames[insertedIndex].IsSelected = true;
+            SyncSlidersFromSelection();
+            FooterText.Text = "Frame split into two half-frame pictures";
+        }
+        catch (Exception exception)
+        {
+            if (originalUpdated)
+            {
+                try { await scannerWorkflow.UpdateFrameFramingAsync(frame.Index, bounds); } catch { }
+            }
+            if (inserted)
+            {
+                try { await scannerWorkflow.DeleteFrameAsync(insertedIndex); } catch { }
+            }
+            if (await RecoverIfScannerFaultedAsync(exception)) return;
+            MessageBox.Show(exception.Message, "Could not split frame", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private async void DeleteFrameClicked(object sender, RoutedEventArgs e)
+    {
+        var frame = GetSingleSelectedFrame("delete it");
+        if (frame == null) return;
+        if (frames.Count == 1)
+        {
+            MessageBox.Show("The last frame cannot be deleted.", "Cannot delete frame", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        if (MessageBox.Show(
+                $"Delete {frame.DisplayName} from this scan?",
+                "Delete frame",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
+        try
+        {
+            FooterText.Text = "Deleting frame…";
+            await scannerWorkflow.DeleteFrameAsync(frame.Index);
+            await ReloadFramesAndPreviewsAsync(CancellationToken.None);
+            FooterText.Text = "Frame deleted";
+        }
+        catch (Exception exception)
+        {
+            if (await RecoverIfScannerFaultedAsync(exception)) return;
+            MessageBox.Show(exception.Message, "Could not delete frame", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private async void ResetAdjustmentsClicked(object sender, RoutedEventArgs e)
@@ -638,6 +1058,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
+            if (await RecoverIfScannerFaultedAsync(ex)) return;
             MessageBox.Show(ex.Message, "Saving failed", MessageBoxButton.OK, MessageBoxImage.Error);
         }
         finally

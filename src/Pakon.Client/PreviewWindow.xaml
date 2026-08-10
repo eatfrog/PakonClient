@@ -1,13 +1,14 @@
 <Window x:Class="Pakon.Client.PreviewWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Frame preview" Width="1180" Height="820" MinWidth="760" MinHeight="560"
+        Title="Frame preview" Width="1180" Height="900" MinWidth="820" MinHeight="680"
         Background="#111412" Foreground="White" WindowStartupLocation="CenterOwner"
         KeyDown="WindowKeyDown">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="68"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="118"/>
             <RowDefinition Height="64"/>
         </Grid.RowDefinitions>
 
@@ -34,7 +35,51 @@
             </Border>
         </ScrollViewer>
 
-        <Border Grid.Row="2" Background="#1B201D" BorderBrush="#303631" BorderThickness="0,1,0,0">
+        <Border Grid.Row="2" Background="#171B18" BorderBrush="#303631" BorderThickness="0,1,0,0">
+            <Grid Margin="20,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="28"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="Framing (high-resolution strip coordinates)" FontWeight="SemiBold"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,9,0,0">
+                        <TextBlock Text="L" VerticalAlignment="Center" Foreground="#AAB2AC"/>
+                        <TextBox x:Name="LeftBox" Width="68" Margin="5,0,12,0" Padding="6,4"/>
+                        <TextBlock Text="T" VerticalAlignment="Center" Foreground="#AAB2AC"/>
+                        <TextBox x:Name="TopBox" Width="68" Margin="5,0,12,0" Padding="6,4"/>
+                        <TextBlock Text="R" VerticalAlignment="Center" Foreground="#AAB2AC"/>
+                        <TextBox x:Name="RightBox" Width="68" Margin="5,0,12,0" Padding="6,4"/>
+                        <TextBlock Text="B" VerticalAlignment="Center" Foreground="#AAB2AC"/>
+                        <TextBox x:Name="BottomBox" Width="68" Margin="5,0,0,0" Padding="6,4"/>
+                    </StackPanel>
+                    <TextBlock x:Name="FramingStatus" FontSize="11" Foreground="#AAB2AC" Margin="0,7,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Move by 16 px" Foreground="#AAB2AC"/>
+                    <Grid Margin="0,6,0,0">
+                        <Grid.RowDefinitions><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                        <Button Grid.Row="0" Grid.Column="1" Content="↑" Padding="11,4" Click="NudgeUpClicked"/>
+                        <Button Grid.Row="1" Grid.Column="0" Content="←" Padding="11,4" Click="NudgeLeftClicked"/>
+                        <Button Grid.Row="1" Grid.Column="1" Content="↓" Padding="11,4" Click="NudgeDownClicked"/>
+                        <Button Grid.Row="1" Grid.Column="2" Content="→" Padding="11,4" Click="NudgeRightClicked"/>
+                    </Grid>
+                </StackPanel>
+
+                <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="ResetFramingButton" Content="Reset detected" Background="#343A36" Padding="14,8" Click="ResetFramingClicked"/>
+                    <Button x:Name="ApplyFramingButton" Content="Apply framing" Background="#2D7356" Padding="16,8" Margin="8,0,0,0" Click="ApplyFramingClicked"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="3" Background="#1B201D" BorderBrush="#303631" BorderThickness="0,1,0,0">
             <Grid Margin="20,0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <Button Content="←" Background="#343A36" Padding="15,8" Click="PreviousClicked" ToolTip="Previous frame (Left arrow)"/>
